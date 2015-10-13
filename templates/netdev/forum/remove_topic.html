@@ -1,0 +1,44 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Editar Postagem{% endblock %}
+
+{% block body_block %}
+
+    <div class="page-header" xmlns="http://www.w3.org/1999/html">
+        <h1>Remover</h1>
+    </div>
+    <div>
+        <form role="form" class="form-signin" id="login_form" method="post" action="">
+            <div class="row">
+                <div class="col-md-8">
+                    {% csrf_token %}
+                    {% if post %}
+                        <input type="hidden" name="post_id" value="{{ post.id }}"/>
+                                                <div class="alert alert-warning" role="alert">
+                          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                          <span class="sr-only">Aviso:</span>
+                         Tem certeza que quer remover a resposta "{{ post.body }}"?
+                        </div>
+                    {% endif %}
+                    {% if topic %}
+                        <input type="hidden" name="topic_id" value="{{ topic.id }}"/>
+                        <div class="alert alert-warning" role="alert">
+                          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                          <span class="sr-only">Aviso:</span>
+                         Tem certeza que quer remover o tópico "{{ topic.title }}"?
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <br>
+        <div class="row">
+            <div class="col-md-2">
+                <button class="btn btn-primary btn-block" type="submit">Confirmar</button>
+            </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}SubForum{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>SubForum: {{ subforum_name }}</h1>
+    </div>
+
+    <div class="panel panel-primary">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-4">SubForuns</div>
+                <div class="col-md-6">Descrição</div>
+                <div class="col-md-2 text-center">Tópicos</div>
+            </div>
+        </div>
+        <!-- List group -->
+        {% if subforum %}
+            {% if categories %}
+                <ul class="list-group">
+                    {% for category in categories %}
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-md-4"><a href="{{ category.url }}">{{ category.name }}</a></div>
+                                <div class="col-md-6">{{ category.description }}</div>
+                                <div class="col-md-2 text-center">{{ category.count_topics }}</div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                </div>
+                  <div class="alert alert-warning" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Aviso</span>Ainda não existem categorias nesse subforum!
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Erro</span> O subforum "{{ subforum_name }}" não existe!
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

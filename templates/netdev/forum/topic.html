@@ -1,0 +1,108 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Tópico{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>Tópico: {{ topic.title }}</h1>
+    </div>
+    <div>
+        {% if topic %}
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        {% if user == topic.user %}
+                        <a href="{% url 'public_profile' topic.user %}"><div class="col-md-7"><strong style="color:white">{{ topic.user.username }}</strong></div></a>
+                            <div class="col-md-1"><form id="edit" method="post" action="editar_topico/">
+                                {% csrf_token %}
+                                <button class="btn btn-info btn-xs" name="edit" type="submit" value="Topic {{ topic.id }}">
+                            Editar</button>
+                            </form></div>
+                             <div class="col-md-1"><form id="edit" method="post" action="remover_topico/">
+                                {% csrf_token %}
+                                <button class="btn btn-info btn-xs" name="remove" type="submit" value="Topic {{ topic.id }}">
+                            Remover</button>
+                            </form></div>
+                        <div class="col-md-3 text-center">{{ topic.creation_date }}</div>
+
+                        {% else %}
+                             <a href="{% url 'public_profile' topic.user %}"><div class="col-md-9"><strong style="color:white">{{ topic.user.username }}</strong></div></a>
+                            <div class="col-md-3 text-center">{{ topic.creation_date }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-2 text-center">
+                        <h4>{{ topic_user.display_name }}</h4>
+                        <a href="{% url 'public_profile' topic.user %}">
+                        <img class="img-responsive" src="/netdev{{ MEDIA_URL }}{{ topic_user.picture }}"alt="profile_image">
+                    </a>
+
+                        <br>Membro desde: <br>{{ topic.user.date_joined.day }}-{{ topic.user.date_joined.month }}-{{ topic.user.date_joined.year }}
+                    </div>
+                    <div class="col-md-10">{{ topic.text }}</div>
+                </div>
+            </div>
+            {% if posts %}
+
+                {% for post in posts %}
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <div class="row">
+
+                                {% if user == post.post.user %}
+                                    <a href="{% url 'public_profile' post.post.user %}"><div class="col-md-7"><strong>{{ post.post.user.username }}</strong></div></a>
+                                    <div class="col-md-1">
+                                    <form id="edit" method="post" action="editar_resposta/">
+                                        {% csrf_token %}
+                                        <button class="btn btn-primary btn-xs" name="edit" type="submit"
+                                                value="Post {{ post.post.id }}">
+                                        Editar</button>
+                                    </form></div>
+                                     <div class="col-md-1"><form id="remove" method="post" action="remover_resposta/">
+                                        {% csrf_token %}
+                                        <button class="btn btn-primary btn-xs" name="remove" type="submit"
+                                                value="Post {{ post.post.id }}">
+                                        Remover</button>
+                                    </form></div>
+                                    <div class="col-md-3 text-center">{{ post.post.updated }}</div>
+                                {% else %}
+                                    <a href="{% url 'public_profile' post.post.user %}"><div class="col-md-9"><strong>{{ post.post.user.username }}</strong></div></a>
+                                    <div class="col-md-3 text-center">{{ post.post.updated }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                    <div class="col-md-2 text-center">
+                        <h4>{{ post.user.display_name }}</h4>
+                        <a href="{% url 'public_profile' post.user %}">
+                        <img class="img-responsive" src="/netdev{{ MEDIA_URL }}{{ post.user.picture }}"alt="profile_image">
+                    </a>
+                        <br>Membro desde: <br>{{ post.post.user.date_joined.day }}-{{ post.post.user.date_joined.month }}-{{ post.post.user.date_joined.year }}
+                    </div>
+                            <div class="col-md-10">{{ post.post.body }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Aviso</span>Esse tópico ainda não tem respostas!
+                </div>
+            {% endif %}
+            <form class="new-answer" method="post" action="nova_resposta/">
+                {% csrf_token %}
+                <button class="btn btn-primary" name="oi" type="submit" value="Submit">
+                Nova Resposta</button>
+            </form>
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Erro</span> O tópico "{{ topic_id }}" não existe!
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock %}

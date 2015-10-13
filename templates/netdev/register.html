@@ -1,0 +1,35 @@
+{% extends 'netdev/base_empty.html' %}
+
+{% load bootstrap3 %}
+
+{% block title %}Registre-se{% endblock %}
+
+{% block body %}
+
+        {% if registered %}
+            <div class="page-header">
+        <h1>Obrigado por se Registrar!</h1>
+    </div>
+            <div class="alert alert-success" role="alert">
+            Usuário Registrado com sucesso!
+                <a href="{% url 'login' %}" class="alert-link">Clique aqui para entrar!</a>
+            </div>
+
+        {% else %}
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+        <form class="form" id="user_form" method="post" action="/netdev/registrar/"
+                enctype="multipart/form-data">
+        <h2>Registrar</h2>
+           {% csrf_token %}
+           {% bootstrap_form user_form %}
+           {% bootstrap_form profile_form %}
+
+            <!-- Provide a button to click to submit the form. -->
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Registrar</button>
+        </form>
+            </div>
+            <div class="col-md-4"></div>
+        {% endif %}
+
+{% endblock %}

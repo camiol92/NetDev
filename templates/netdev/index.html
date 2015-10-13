@@ -1,0 +1,21 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Index{% endblock %}
+
+{% block body_block %}
+  <div class="page-header">
+      {% if user.is_authenticated %}
+      <h1>Novidades</h1>
+    </div>
+    <div>
+        <p></strong>novidades!</p>
+    </div>
+    {% else %}
+          <h1>Bem Vindo!</h1>
+          </div>
+          Por favor, se cadastre ou entre em seu usuário para ter acesso a rede social mais interativa do Brasil!
+    {% endif %}
+{% endblock %}
+

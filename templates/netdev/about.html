@@ -1,0 +1,20 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %}
+
+{% block title %}About{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+                <h1>About</h1>
+            </div>
+            <div>
+                {% if user.is_authenticated %}
+            <p></strong>  Voce ja visitou esse site {{ visits }} vezes! <br>
+         Seu ultimo acesso foi em {{ last_visit }} </p>
+            {% else %}
+                    Bem vindo ao NetDev! <br>
+                {% endif %}
+            <img  width="200" height="100" src="{% static "logo.png" %}" alt="NetDev logo" /> <!-- New line -->
+            </div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Caixa de Entrada{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>Minhas Mensagens</h1>
+    </div>
+    <ul class="nav nav-tabs">
+      <li role="presentation" class="active"><a href="{% url 'inbox' %}">Caixa de Entrada</a></li>
+      <li role="presentation"><a href="{% url 'outbox' %}">Caixa de Saída</a></li>
+      <li role="presentation"><a href="{% url 'new_message' %}">Nova Mensagem</a></li>
+    </ul>
+    <br>
+    <div class="panel panel-primary">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-6">Assunto</div>
+                <div class="col-md-2 text-center">Remetente</div>
+                <div class="col-md-4 text-center">Data</div>
+              </div>
+        </div>
+            {% if inbox %}
+                <ul class="list-group">
+                    {% for message in inbox %}
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-md-6"><a href="{% url 'message' message.id %}">{{ message.title }}</a></div>
+                                <div class="col-md-2 text-center">{{ message.sender }}</div>
+                                <div class="col-md-4 text-center">{{ message.date }}</div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+
+        {% else %}
+                </div>
+                <div class="alert alert-warning" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Aviso</span>Você ainda não possui mensagens!
+                </div>
+
+        {% endif %}
+
+
+{% endblock %}

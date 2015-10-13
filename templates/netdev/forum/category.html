@@ -1,0 +1,64 @@
+{% extends 'netdev/base.html' %}
+
+{% block title %}Forum{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>Categoria: {{ category_name }}</h1>
+    </div>
+
+    <div class="panel panel-primary">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-4">Tópicos</div>
+                <div class="col-md-1 text-center">Criador</div>
+                <div class="col-md-1 text-center">Status</div>
+                <div class="col-md-3 text-center">Data de Criação</div>
+                <div class="col-md-1 text-center">Respostas</div>
+                <div class="col-md-2 text-center">Ultima Resposta</div>
+            </div>
+        </div>
+
+        {% if category %}
+            {% if topics %}
+                <ul class="list-group">
+                    {% for topic in topics %}
+                        <li class="list-group-item">
+                            <div class="row">
+
+                                <div class="col-md-4"><a href="{{ topic.id }}">{{ topic.title }}</a></div>
+                                <div class="col-md-1 text-center"><a href="{% url 'public_profile' topic.user %}">{{ topic.user }}</a></div>
+                                {% if topic.is_closed == True %}
+                                    <div class="col-md-1 text-center">Trancado</div>
+                                {% else %}
+                                    <div class="col-md-1 text-center">Aberto</div>
+                                {% endif %}
+                                <div class="col-md-3 text-center">{{ topic.creation_date }}</div>
+                                <div class="col-md-1 text-center">{{ topic.count_posts }}</div>
+                                <div class="col-md-2 text-center">{{ topic.last_post }}</div>
+
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% else %}
+                </div>
+                <div class="alert alert-warning" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Aviso</span>Ainda não existem tópicos nessa categoria!
+                </div>
+            {% endif %}
+
+            <form class="new-topic" method="post" action="novo_topico/">
+                {% csrf_token %}
+                <button class="btn btn-primary" type="submit" value="Submit">Novo Tópico</button>
+            </form>
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Erro</span> A categoria "{{ category_name }}" não existe!
+            </div>
+        {% endif %}
+{% endblock %}

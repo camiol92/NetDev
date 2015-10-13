@@ -1,0 +1,43 @@
+{% extends 'netdev/base.html' %}
+
+{% load bootstrap3 %}
+
+{% block title %}Forum{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>Forum</h1>
+    </div>
+    <div class="panel panel-primary">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-4">Fóruns</div>
+                <div class="col-md-6">Descrição</div>
+                <div class="col-md-2 text-center">SubFóruns</div>
+            </div>
+        </div>
+        <!-- List group -->
+        {% if foruns %}
+            <ul class="list-group">
+                {% for forum in foruns %}
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-4"><a href="{% url 'forum' forum.url %}">{{ forum.name }}</a></div>
+                            <div class="col-md-6">{{ forum.description }}</div>
+                            <div class="col-md-2 text-center">{{ forum.count_subforuns }}</div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            </div>
+        {% else %}
+            </div>
+            <div class="alert alert-warning" role="alert">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Aviso</span>Ainda não existem foruns de discussão!
+            </div>
+
+        {% endif %}
+
+{% endblock %}

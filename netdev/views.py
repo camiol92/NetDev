@@ -1,0 +1,819 @@
+from django.template import RequestContext
+from django.shortcuts import render_to_response, render
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect, HttpResponse
+
+from netdev.models import *
+from netdev.forms import *
+from datetime import datetime
+
+# suport functions
+
+def decode_url(url_to_decode):
+    return url_to_decode.replace('_', ' ')
+
+def encode_url(url_to_encode):
+    return url_to_encode.replace(' ', '_')
+
+@login_required
+def restricted(request):
+    return HttpResponse("Since you're logged in, you can see this text!")
+
+# Use the login_required() decorator to ensure only those logged in can access the view.
+@login_required
+def user_logout(request):
+    # Since we know the user is logged in, we can now just log them out.
+    logout(request)
+
+    # Take the user back to the homepage.
+    return HttpResponseRedirect('/netdev/')
+
+def create_topic(forum_name_url, subforum_name_url, category_name_url):
+
+    url = "/netdev/forum/%s/%s/%s/" % (forum_name_url, subforum_name_url, category_name_url)
+
+    return HttpResponseRedirect(url)
+
+def create_post(forum_name_url, subforum_name_url, category_name_url, topic_id):
+
+    url = "/netdev/forum/%s/%s/%s/%s/" % (forum_name_url, subforum_name_url, category_name_url, topic_id)
+
+    return HttpResponseRedirect(url)
+
+#view functions
+
+def register(request):
+
+    # A boolean value for telling the template whether the registration was successful.
+    # Set to False initially. Code changes value to True when registration succeeds.
+    registered = False
+
+    if request.user.is_authenticated():
+        return HttpResponse("You are logged in!")
+    else:
+        # If it's a HTTP POST, we're interested in processing form data.
+        if request.method == 'POST':
+            # Attempt to grab information from the raw form information.
+            # Note that we make use of both UserForm and UserProfileForm.
+            user_form = UserForm(data=request.POST)
+            profile_form = UserProfileForm(data=request.POST)
+
+            # If the two forms are valid...
+            if user_form.is_valid() and profile_form.is_valid():
+                # Save the user's form data to the database.
+                user = user_form.save()
+
+                # Now we hash the password with the set_password method.
+                # Once hashed, we can update the user object.
+                user.set_password(user.password)
+                user.save()
+                Friendlist.objects.create(main_user=user)
+
+                # Now sort out the UserProfile instance.
+                # Since we need to set the user attribute ourselves, we set commit=False.
+                # This delays saving the model until we're ready to avoid integrity problems.
+                profile = profile_form.save(commit=False)
+                profile.user = user
+                PublicProfile.objects.create(user=user)
+
+                # Did the user provide a profile picture?
+                # If so, we need to get it from the input form and put it in the UserProfile model.
+                if 'picture' in request.FILES:
+                    profile.picture = request.FILES['picture']
+
+                # Now we save the UserProfile model instance.
+                profile.save()
+
+                # Update our variable to tell the template registration was successful.
+                registered = True
+
+            # Invalid form or forms - mistakes or something else?
+            # Print problems to the terminal.
+            # They'll also be shown to the user.
+            else:
+                print user_form.errors, profile_form.errors
+
+        # Not a HTTP POST, so we render our form using two ModelForm instances.
+        # These forms will be blank, ready for user input.
+        else:
+            user_form = UserForm()
+            profile_form = UserProfileForm()
+
+        # Render the template depending on the context.
+        return render(request, 'netdev/register.html',
+                {'user_form': user_form, 'profile_form': profile_form, 'registered': registered} )
+
+def user_login(request):
+
+    # If the request is a HTTP POST, try to pull out the relevant information.
+    if request.user.is_authenticated():
+        return HttpResponse("You are logged in!")
+    else:
+        if request.method == 'POST':
+            # Gather the username and password provided by the user.
+            # This information is obtained from the login form.
+                    # We use request.POST.get('<variable>') as opposed to request.POST['<variable>'],
+                    # because the request.POST.get('<variable>') returns None, if the value does not exist,
+                    # while the request.POST['<variable>'] will raise key error exception
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+
+            # Use Django's machinery to attempt to see if the username/password
+            # combination is valid - a User object is returned if it is.
+            user = authenticate(username=username, password=password)
+
+            # If we have a User object, the details are correct.
+            # If None (Python's way of representing the absence of a value), no user
+            # with matching credentials was found.
+            if user:
+                # Is the account active? It could have been disabled.
+                if user.is_active:
+                    # If the account is valid and active, we can log the user in.
+                    # We'll send the user back to the homepage.
+                    login(request, user)
+                    return HttpResponseRedirect('/netdev/')
+                else:
+                    # An inactive account was used - no logging in!
+                    return HttpResponse("Sua conta NetDev esta desativada.")
+            else:
+                # Bad login details were provided. So we can't log the user in.
+                print "Informacoes invalidas de Login: {0}, {1}".format(username, password)
+                return render(request, 'netdev/login.html', {'erro': True})
+
+        # The request is not a HTTP POST, so display the login form.
+        # This scenario would most likely be a HTTP GET.
+        else:
+            # No context variables to pass to the template system, hence the
+            # blank dictionary object...
+            return render(request, 'netdev/login.html', {})
+
+@login_required
+def users(request):
+    context_dict = user_info(request)
+    users_dict = []
+
+    users = User.objects.all().order_by('date_joined')[:10]
+    friend_list = Friendlist.objects.get_or_create(main_user=request.user)[0]
+
+
+    for user in users:
+        if user.username == 'moderador':
+            pass
+        elif user.username == 'admin':
+            pass
+        else:
+            if user in friend_list.friends.all():
+                users_dict.append({'user':user, 'profile':UserProfile.objects.get(user=user), 'is_friend': True})
+            else:
+                 users_dict.append({'user':user, 'profile':UserProfile.objects.get(user=user), 'is_friend': False})
+
+    context_dict.update({'users': users_dict})
+
+    return render(request, 'netdev/users.html', context_dict)
+
+@login_required
+def friends(request):
+    context_dict = user_info(request)
+    users_dict = []
+
+    friend_list = Friendlist.objects.get_or_create(main_user=request.user)[0]
+
+    for user in friend_list.friends.all():
+        users_dict.append({'user':user, 'profile':UserProfile.objects.get(user=user), 'is_friend': True})
+
+
+    context_dict.update({'users': users_dict})
+
+    return render(request, 'netdev/friends.html', context_dict)
+
+@login_required
+def inbox(request):
+    context_dict = user_info(request)
+
+    inbox = Message.objects.filter(recipient=request.user).order_by('-date')
+
+    context_dict.update({'inbox': inbox})
+
+    return render(request, 'netdev/messages/inbox.html', context_dict)
+
+@login_required
+def outbox(request):
+    context_dict = user_info(request)
+
+    outbox = Message.objects.filter(sender=request.user)
+
+    context_dict.update({'outbox':outbox})
+
+    return render(request, 'netdev/messages/outbox.html', context_dict)
+
+@login_required
+def new_message(request):
+    context_dict = user_info(request)
+
+    outbox = Message.objects.filter(sender=request.user)
+    inbox = Message.objects.filter(recipient=request.user)
+
+    context_dict.update({'inbox': inbox, 'outbox':outbox})
+
+    return render(request, 'netdev/messages/new_message.html', context_dict)
+
+@login_required
+def message(request, message_id):
+    context_dict = user_info(request)
+
+    message = Message.objects.get(id=message_id)
+
+    context_dict.update({'message': message})
+
+    return render(request, 'netdev/messages/message.html', context_dict)
+
+@login_required
+def my_topics(request):
+    context_dict = user_info(request)
+    topic_dict = []
+
+    topic_list = Topic.objects.filter(user=request.user).order_by('-creation_date')
+    for topic in topic_list:
+        category = topic.category
+        subforum = topic.category.subforum
+        forum = topic.category.subforum.forum
+        topic_dict.append({'topic': topic, 'category':category, 'subforum':subforum,'forum':forum,
+        'url': encode_url("/netdev/forum/%s/%s/%s/%s/"%(forum, subforum, category, topic.id))})
+
+    context_dict.update({'topics': topic_dict})
+
+    return render(request, 'netdev/forum/my_topics.html', context_dict)
+
+@login_required
+def repositorys(request):
+    context_dict = user_info(request)
+    return render(request, 'netdev/repositorys.html', context_dict)
+
+def user_info(request):
+
+    context_dict = {}
+    current_user = request.user
+    if current_user.username == 'admin':
+        context_dict['user'] = current_user
+        context_dict['user_profile'] = {'display_name': 'Admin'}
+
+    elif current_user.is_authenticated():
+        context_dict['user'] = current_user
+        user_profile = UserProfile.objects.get(user=current_user)
+        public_profile = PublicProfile.objects.get(user=current_user)
+        context_dict['user_profile'] = user_profile
+        context_dict['public_profile'] = public_profile
+
+    return context_dict
+
+def index(request):
+
+    context_dict = user_info(request)
+
+    if context_dict != {}:
+
+        user = request.user
+
+        #contando o numero de acessos do usuario
+        visits = request.session.get('visits')
+        if not visits:
+            visits = 1
+        reset_last_visit_time = False
+
+        last_visit = request.session.get('last_visit')
+        if last_visit:
+            last_visit_time = datetime.strptime(last_visit[:-7], "%Y-%m-%d %H:%M:%S")
+
+            if (datetime.now() - last_visit_time).seconds > 0:
+                # ...reassign the value of the cookie to +1 of what it was before...
+                visits = visits + 1
+                # ...and update the last visit cookie, too.
+                reset_last_visit_time = True
+        else:
+            # Cookie last_visit doesn't exist, so create it to the current date/time.
+            reset_last_visit_time = True
+
+        if reset_last_visit_time:
+            request.session['last_visit'] = str(datetime.now())
+            request.session['visits'] = visits
+
+    response = render(request,'netdev/index.html', context_dict)
+
+    return response
+
+@login_required
+def profile(request):
+
+    context_dict = user_info(request)
+
+    return render(request, 'netdev/profile.html', context_dict )
+
+@login_required
+def public_profile(request, username):
+
+    context_dict = user_info(request)
+    user = User.objects.get(username=username)
+    context_dict.update({'public_user': user,
+                    'public_user_general':UserProfile.objects.get(user=user),
+                    'public_user_profile':PublicProfile.objects.get(user=user)})
+    friend_list = Friendlist.objects.get_or_create(main_user=request.user)[0]
+
+    if user in friend_list.friends.all():
+        context_dict['is_friend'] = True
+    else:
+        context_dict['is_friend'] = False
+
+    return render(request, 'netdev/public_profile.html', context_dict )
+
+@login_required
+def change_profile(request):
+    context_dict = user_info(request)
+    if request.POST:
+        if 'job' in request.POST:
+            public_profile = PublicProfile.objects.get(user=request.user)
+            public_profile.academics = request.POST['academics']
+            public_profile.experience = request.POST['experience']
+            public_profile.tags = request.POST['tags']
+            public_profile.job = request.POST['job']
+            public_profile.location = request.POST['location']
+            public_profile.save()
+
+            return HttpResponseRedirect('/netdev/perfil/')
+
+    return render(request, 'netdev/edit_profile.html', context_dict)
+
+@login_required
+def confirm_friendship(request, username):
+
+    context_dict = user_info(request)
+    user = User.objects.get(username=username)
+    context_dict.update({'public_user': user,
+                    'public_user_profile':UserProfile.objects.get(user=user)})
+
+    if request.POST:
+        friend_list = Friendlist.objects.get_or_create(main_user=request.user)[0]
+
+        try:
+            friend_list.friends.add(user)
+            friend_list.save()
+            context_dict['success'] = True
+        except:
+            pass
+
+
+    return render(request, 'netdev/confirm_friendship.html', context_dict )
+
+@login_required
+def remove_friendship(request, username):
+
+    context_dict = user_info(request)
+    user = User.objects.get(username=username)
+    context_dict.update({'public_user': user,
+                    'public_user_profile':UserProfile.objects.get(user=user)})
+
+    if request.POST:
+        friend_list = Friendlist.objects.get_or_create(main_user=request.user)[0]
+
+        try:
+            friend_list.friends.remove(user)
+            friend_list.save()
+            context_dict['success'] = True
+        except:
+            pass
+
+
+    return render(request, 'netdev/remove_friendship.html', context_dict )
+
+def about(request):
+   # Construct a dictionary to pass to the template engine as its context.
+    # Note the key boldmessage is the same as {{ boldmessage }} in the template!
+    context_dict = user_info(request)
+    if context_dict != {}:
+        visits = request.session.get('visits')
+        if not visits:
+            visits = 1
+
+        last_visit = request.session.get('last_visit')
+        if not last_visit:
+           last_visit = str(datetime.now())
+
+        context_dict['visits'] = str(visits)
+        context_dict['last_visit'] = last_visit[0:16    ]
+
+        # Return a rendered response to send to the client.
+        # We make use of the shortcut function to make our lives easier.
+        # Note that the first parameter is the template we wish to use.
+    return render(request,'netdev/about.html', context_dict)
+
+# Forum Views
+@login_required
+def foruns(request):
+    # Request the context of the request.
+    # The context contains information such as the client's machine details, for example.
+    #context = RequestContext(request)
+
+    # Construct a dictionary to pass to the template engine as its context.
+    context_dict = user_info(request)
+
+    forum_list = Forum.objects.order_by('name')
+    context_dict['foruns'] = forum_list
+
+    for forum in forum_list:
+        forum.url = forum.name.replace(' ', '_')
+
+    # Return a rendered response to send to the client.
+    # We make use of the shortcut function to make our lives easier.
+    # Note that the first parameter is the template we wish to use.
+    return render(request, 'netdev/forum/foruns.html', context_dict)
+
+@login_required
+def forum(request, forum_name_url):
+    # Request our context from the request passed to us.
+    context = RequestContext(request)
+
+    # Change underscores in the forum name to spaces.
+    # URLs don't handle spaces well, so we encode them as underscores.
+    # We can then simply replace the underscores with spaces again to get the name.
+    forum_name = forum_name_url.replace('_', ' ')
+
+    # Create a context dictionary which we can pass to the template rendering engine.
+    # We start by containing the name of the forum passed by the user.
+
+    context_dict = user_info(request)
+    context_dict['forum_name'] = forum_name
+
+    try:
+        # Can we find a forum with the given name?
+        # If we can't, the .get() method raises a DoesNotExist exception.
+        # So the .get() method returns one model instance or raises an exception.
+        forum = Forum.objects.get(name=forum_name)
+
+        # Retrieve all of the associated topics.
+        # Note that filter returns >= 1 model instance.
+        subforuns = SubForum.objects.filter(forum=forum)
+
+        # Adds our results list to the template context under name pages.
+        context_dict['subforuns'] = subforuns
+        # We also add the forum object from the database to the context dictionary.
+        # We'll use this in the template to verify that the forum exists.
+        context_dict['forum'] = forum
+
+        for subforum in subforuns:
+            subforum.url = subforum.name.replace(' ', '_')
+
+    except Forum.DoesNotExist:
+        # We get here if we didn't find the specified forum.
+        # Don't do anything - the template displays the "no Forum" message for us.
+        pass
+
+    # Go render the response and return it to the client.
+    return render_to_response('netdev/forum/forum.html', context_dict, context)
+
+@login_required
+def subforum(request, forum_name_url, subforum_name_url):
+
+    context = RequestContext(request)
+
+    forum_name = forum_name_url.replace('_', ' ')
+    subforum_name = subforum_name_url.replace('_', ' ')
+
+    context_dict = user_info(request)
+    context_dict['forum_name'] = forum_name
+    context_dict['subforum_name'] = subforum_name
+
+    try:
+        forum = Forum.objects.get(name=forum_name)
+        subforum = SubForum.objects.filter(forum=forum, name=subforum_name)[0]
+        categories = Category.objects.filter(subforum=subforum).order_by('name')[:10]
+
+        context_dict['forum'] = forum
+        context_dict['subforum'] = subforum
+        context_dict['categories'] = categories
+
+        for category in categories:
+            category.url = category.name.replace(' ', '_')
+
+    except SubForum.DoesNotExist:
+        pass
+
+    return render_to_response('netdev/forum/subforum.html', context_dict, context)
+
+@login_required
+def category(request, forum_name_url, subforum_name_url, category_name_url):
+
+    context = RequestContext(request)
+
+    forum_name = forum_name_url.replace('_', ' ')
+    subforum_name = subforum_name_url.replace('_', ' ')
+    category_name = category_name_url.replace('_', ' ')
+
+    context_dict = user_info(request)
+    context_dict['forum_name'] = forum_name
+    context_dict['subforum_name'] = subforum_name
+    context_dict['category_name'] = category_name
+
+    try:
+        forum = Forum.objects.get(name=forum_name)
+        subforum = SubForum.objects.filter(forum=forum, name=subforum_name)[0]
+        category = Category.objects.filter(subforum=subforum, name=category_name)[0]
+        topics = Topic.objects.filter(category=category)
+
+        context_dict['forum'] = forum
+        context_dict['subforum'] = subforum
+        context_dict['category'] = category
+        context_dict['topics'] = topics
+
+    except Category.DoesNotExist:
+        pass
+
+    return render_to_response('netdev/forum/category.html', context_dict, context)
+
+@login_required
+def topic(request, forum_name_url, subforum_name_url, category_name_url, topic_id):
+
+    context = RequestContext(request)
+    context_dict = user_info(request)
+
+    forum_name = forum_name_url.replace('_', ' ')
+    subforum_name = subforum_name_url.replace('_', ' ')
+    category_name = category_name_url.replace('_', ' ')
+
+    context_dict.update({'forum_name': forum_name, 'subforum_name': subforum_name, 'category_name': category_name,
+                    'topic_id': topic_id, 'url': 'netdev/forum/%s/%s/%s/%s/' % (forum_name, subforum_name, category_name, topic_id)})
+
+    try:
+        forum = Forum.objects.get(name=forum_name)
+        subforum = SubForum.objects.filter(forum=forum,name=subforum_name)[0]
+        category = Category.objects.filter(subforum=subforum, name=category_name)[0]
+        topic = Topic.objects.get(id=topic_id)
+        posts = Post.objects.filter(topic=topic).order_by('updated')
+
+        topic_user = UserProfile.objects.get(user=topic.user)
+        post_objects = []
+        for post in posts:
+            user_profile = UserProfile.objects.get(user=post.user)
+            post_objects.append({'user': user_profile, 'post': post})
+
+        context_dict['forum'] = forum
+        context_dict['subforum'] = subforum
+        context_dict['category'] = category
+        context_dict['topic'] = topic
+        context_dict['topic_user'] = topic_user
+        context_dict['posts'] = post_objects
+
+    except Topic.DoesNotExist:
+        pass
+
+    return render_to_response('netdev/forum/topic.html', context_dict, context)
+
+@login_required
+def add_topic(request, forum_name_url, subforum_name_url, category_name_url):
+    # Get the context from the request.
+    context = RequestContext(request)
+
+    forum_name = forum_name_url.replace('_', ' ')
+    subforum_name = subforum_name_url.replace('_', ' ')
+    category_name = category_name_url.replace('_', ' ')
+
+    context_dict = user_info(request)
+
+    # A HTTP POST?
+    if request.method == 'POST':
+        form = TopicForm(request.POST)
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+            # Save the new category to the database.
+            topic = form.save(commit=False)
+
+            # Now call the index() view.
+            # The user will be shown the homepage.
+            try:
+                forum = Forum.objects.get(name=forum_name)
+                subforum = SubForum.objects.filter(forum=forum, name=subforum_name)[0]
+                category_object = Category.objects.filter(subforum=subforum, name=category_name)[0]
+
+                topic.category = category_object
+                topic.user = request.user
+            except Category.DoesNotExist:
+                # If we get here, the subcategory does not exist.
+                # Go back and render the add category form as a way of saying the category does not exist.
+                return render_to_response('netdev/forum/add_topic.html', context_dict, context)
+
+            topic.save()
+
+            return create_topic(forum_name_url, subforum_name_url, category_name_url)
+        else:
+            # The supplied form contained errors - just print them to the terminal.
+            print form.errors
+    else:
+        # If the request was not a POST, display the form to enter details.
+        form = TopicForm()
+
+    # Bad form (or form details), no form supplied...
+    # Render the form with error messages (if any).
+    context_dict['topic_form'] =  form
+
+    return render_to_response('netdev/forum/add_topic.html', context_dict, context)
+
+@login_required
+def add_post(request, forum_name_url, subforum_name_url, category_name_url, topic_id):
+    context = RequestContext(request)
+
+    forum_name = forum_name_url.replace('_', ' ')
+    subforum_name = subforum_name_url.replace('_', ' ')
+    category_name = category_name_url.replace('_', ' ')
+
+    context_dict = user_info(request)
+
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+
+        if form.is_valid():
+            # This time we cannot commit straight away.
+            # Not all fields are automatically populated!
+            post = form.save(commit=False)
+
+            # Retrieve the associated Category object so we can add it.
+            # Wrap the code in a try block - check if the category actually exists!
+            try:
+                forum = Forum.objects.get(name=forum_name)
+                subforum = SubForum.objects.filter(forum=forum, name=subforum_name)[0]
+                category = Category.objects.filter(subforum=subforum, name=category_name)[0]
+                topic_ob = Topic.objects.get(id=topic_id)
+                post.topic = topic_ob
+                post.user = request.user
+
+            except Topic.DoesNotExist:
+                # If we get here, the topic does not exist.
+                # Go back and render the add category form as a way of saying the category does not exist.
+                return render_to_response('netdev/forum/topic.html', context_dict, context)
+
+            # Also, create a default value for the number of views.
+            post.views = 0
+
+            # With this, we can then save our new model instance.
+            post.save()
+
+            # Now that the page is saved, display the category instead.
+            return create_post(forum_name_url, subforum_name_url, category_name_url, topic_id)
+        else:
+            print form.errors
+    else:
+        form = PostForm()
+
+    context_dict['post_form'] = form
+
+    return render_to_response('netdev/forum/add_post.html', context_dict, context)
+
+@login_required
+def edit_topic(request, forum_name_url, subforum_name_url, category_name_url, topic_id):
+
+    context_dict = user_info(request)
+
+    forum_name = forum_name_url.replace('_', ' ')
+    subforum_name = subforum_name_url.replace('_', ' ')
+    category_name = category_name_url.replace('_', ' ')
+
+    if request.method == 'POST':
+        if 'edit' in request.POST:
+            try:
+                forum = Forum.objects.get(name=forum_name)
+                subforum = SubForum.objects.filter(forum=forum, name=subforum_name)[0]
+                category = Category.objects.filter(subforum=subforum, name=category_name)[0]
+                topic_ob = Topic.objects.get(id=topic_id)
+
+                if 'Post' in request.POST['edit']:
+                    post_ob = Post.objects.get(id=request.POST['edit'].strip('Post '))
+                    context_dict['post'] = post_ob
+
+                    return render(request, 'netdev/forum/edit_topic.html', context_dict)
+                elif 'Topic' in request.POST['edit']:
+                    topic_ob = Topic.objects.get(id=request.POST['edit'].strip('Topic '))
+                    context_dict['topic'] = topic_ob
+
+                    return render(request, 'netdev/forum/edit_topic.html', context_dict)
+
+                else:
+                    print 'none'
+
+            except Topic.DoesNotExist:
+                # If we get here, the topic does not exist.
+                # Go back and render the add category form as a way of saying the category does not exist.
+                return render(request, 'netdev/forum/category.html', context_dict)
+
+        elif 'post_id' in request.POST:
+            try:
+                text = request.POST['body']
+                post_id = request.POST['post_id']
+                post_ob = Post.objects.get(id=post_id)
+                post_ob.body = text
+                post_ob.creation_date = datetime.now()
+                post_ob.save()
+
+                return create_post(forum_name_url, subforum_name_url, category_name_url, topic_id)
+
+
+            except Post.DoesNotExist:
+                # If we get here, the topic does not exist.
+                # Go back and render the add category form as a way of saying the category does not exist.
+                return render(request, 'netdev/forum/category.html', context_dict)
+
+        elif 'topic_id' in request.POST:
+            try:
+                text = request.POST['text']
+                title = request.POST['title']
+                topic_id = request.POST['topic_id']
+                topic_ob = Topic.objects.get(id=topic_id)
+                topic_ob.text = text
+                topic_ob.title = title
+                topic_ob.save()
+
+                return create_post(forum_name_url, subforum_name_url, category_name_url, topic_id)
+
+
+            except Topic.DoesNotExist:
+                # If we get here, the topic does not exist.
+                # Go back and render the add category form as a way of saying the category does not exist.
+                return render(request, 'netdev/forum/category.html', context_dict)
+
+        else:
+            print 'error'
+
+    else:
+        print 'nao post'
+    return render(request, 'netdev/forum/edit_topic.html', context_dict)
+
+@login_required
+def edit_post(request, forum_name_url, subforum_name_url, category_name_url, topic_id):
+    return edit_topic(request, forum_name_url, subforum_name_url, category_name_url, topic_id)
+
+@login_required
+def remove_topic(request, forum_name_url, subforum_name_url, category_name_url, topic_id):
+
+    context_dict = user_info(request)
+
+    if request.method == 'POST':
+        if 'remove' in request.POST:
+            try:
+                topic_ob = Topic.objects.get(id=topic_id)
+                context_dict['topic'] = topic_ob
+
+                return render(request, 'netdev/forum/remove_topic.html', context_dict)
+            except Topic.DoesNotExist:
+                # If we get here, the topic does not exist.
+                # Go back and render the add category form as a way of saying the category does not exist.
+                return render(request, 'netdev/forum/topic.html', context_dict)
+
+        if 'topic_id' in request.POST:
+            try:
+                topic_ob = Topic.objects.get(id=topic_id)
+                posts = Post.objects.filter(topic=topic_ob)
+                posts.delete()
+                topic_ob.delete()
+
+                return HttpResponseRedirect('/netdev/forum/%s/%s/%s/' % (forum_name_url, subforum_name_url, category_name_url))
+
+
+            except Topic.DoesNotExist:
+                # If we get here, the topic does not exist.
+                # Go back and render the add category form as a way of saying the category does not exist.
+                return render(request, 'netdev/forum/topic.html', context_dict)
+
+
+    return render(request, 'netdev/forum/topic.html', context_dict)
+
+@login_required
+def remove_post(request, forum_name_url, subforum_name_url, category_name_url, topic_id):
+
+    context_dict = user_info(request)
+
+    print request.POST
+
+    if request.method == 'POST':
+        if 'remove' in request.POST:
+            try:
+                post_ob = Post.objects.get(id=request.POST['remove'].strip('Post '))
+                context_dict['post'] = post_ob
+
+                return render(request, 'netdev/forum/remove_topic.html', context_dict)
+
+            except Post.DoesNotExist:
+                # If we get here, the topic does not exist.
+                # Go back and render the add category form as a way of saying the category does not exist.
+                return render(request, 'netdev/forum/topic.html', context_dict)
+
+        if 'post_id' in request.POST:
+            try:
+                post_ob = Post.objects.get(id=request.POST['post_id'])
+                post_ob.delete()
+
+                return HttpResponseRedirect('/netdev/forum/%s/%s/%s/%s/' % (forum_name_url, subforum_name_url, category_name_url, topic_id))
+
+            except Post.DoesNotExist:
+                # If we get here, the topic does not exist.
+                # Go back and render the add category form as a way of saying the category does not exist.
+                return render(request, 'netdev/forum/topic.html', context_dict)
+
+    return render(request, 'netdev/forum/topic.html', context_dict)

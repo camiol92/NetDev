@@ -1,0 +1,55 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Tópico{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>Meus Tópicos</h1>
+    </div>
+ <div class="panel panel-primary">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-4">Tópicos</div>
+                <div class="col-md-1 text-center">Fórum</div>
+                <div class="col-md-1 text-center">SubForum</div>
+                <div class="col-md-1 text-center">Categoria</div>
+                <div class="col-md-1 text-center">Status</div>
+                <div class="col-md-1 text-center">Respostas</div>
+                <div class="col-md-3 text-center">Data de Criação</div>
+
+              </div>
+        </div>
+
+            {% if topics %}
+                <ul class="list-group">
+                    {% for topic in topics %}
+                        <li class="list-group-item">
+                            <div class="row">
+
+                                <div class="col-md-4"><a href="{{ topic.url }}">{{ topic.topic.title }}</a></div>
+                                <div class="col-md-1 text-center">{{ topic.forum }}</div>
+                                <div class="col-md-1 text-center">{{ topic.subforum }}</div>
+                                <div class="col-md-1 text-center">{{ topic.category }}</div>
+                                {% if topic.is_closed == True %}
+                                    <div class="col-md-1 text-center">Trancado</div>
+                                {% else %}
+                                    <div class="col-md-1 text-center">Aberto</div>
+                                {% endif %}
+                                <div class="col-md-1 text-center">{{ topic.topic.count_posts }}</div>
+                                <div class="col-md-3 text-center">{{ topic.topic.creation_date }}</div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+    {% else %}
+                </div>
+                <div class="alert alert-warning" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Aviso</span>Você ainda não possui tópicos no forum!
+                </div>
+    {% endif %}
+{% endblock %}
