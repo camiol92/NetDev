@@ -5,17 +5,65 @@
 {% block title %}Index{% endblock %}
 
 {% block body_block %}
-  <div class="page-header">
-      {% if user.is_authenticated %}
-      <h1>Novidades</h1>
-    </div>
-    <div>
-        <p></strong>novidades!</p>
-    </div>
+
+    {% if user.is_authenticated %}
+        <div class="page-header">
+            <h1>Novidades</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-10">
+                <form id="status_update" method="post" action="">
+                    <label for="inputText">Atualização de Status</label>
+                        <textarea class="form-control" rows="3" id="inputText" name="body"
+                                  autofocus=""></textarea>
+                    <br>
+                    {% csrf_token %}
+                    <button class="btn btn-primary" type="submit" value="Send Message">Publicar Status</button>
+                </form>
+            </div>
+        </div><br>
+
+        {% for update in updates %}
+            <div class="col-md-10">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        <div class="col-md-2">
+                            <a href="{% url 'public_profile' update.update.user %}">
+                                <img class="img-responsive"
+                                     src="/netdev{{ MEDIA_URL }}{{ update.profile.picture }}"
+                                     alt="profile_image">
+                            </a>
+                        </div>
+                        <div class="col-md-8">
+                            <a href="{% url 'public_profile' update.update.user %}">
+                                <strong>{{ update.profile.display_name }}</strong>
+                            </a> - {{ update.update.date }}
+                            {% if update.update.user == user %}
+                                <span style="padding-left: 5%"></span>
+                                <a href="{% url 'edit_status' update.update.id %}" class="btn btn-sm btn-primary"
+                                   name="edit">Editar</a>
+                                <span style="padding-left: 2%"></span>
+                                <a href="{% url 'remove_status' update.update.id %}" class="btn btn-sm btn-primary"
+                                   name="remove">Remover</a>
+                            {% endif %}
+                            <br>
+                            {{ update.update.text }}
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        {% endfor %}
+
     {% else %}
-          <h1>Bem Vindo!</h1>
-          </div>
-          Por favor, se cadastre ou entre em seu usuário para ter acesso a rede social mais interativa do Brasil!
+        <div class="page-header">
+            <h1>Bem Vindo!</h1>
+        </div>
+        Por favor, se cadastre ou entre em seu usuário para ter acesso a rede social mais interativa do Brasil!
     {% endif %}
 {% endblock %}
 

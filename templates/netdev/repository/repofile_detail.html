@@ -1,0 +1,63 @@
+{% extends "netdev/base.html" %}
+{% load i18n %}
+
+{% block title %}Arquivo: {{ file.name }}{% endblock %}
+
+{% block body_block %}
+
+    <div class="page-header">
+        <h1>Arquivo: {{ file.name }}</h1>
+    </div>
+    <ul class="nav nav-tabs">
+        <li role="presentation"><a href="{% url 'repository_index' %}">Início</a></li>
+        <li role="presentation"><a href="{% url 'category_list' %}">Diretórios</a></li>
+        <li role="presentation"><a href="{% url 'add_file' %}">Adicionar Arquivo</a></li>
+        <li role="presentation"><a href="{% url 'add_filecat' %}">Novo Diretório</a></li>
+    </ul>
+
+<br>
+    <div class="col-md-12">
+    <div class="panel panel-primary">
+    <div class="panel-body">
+    <div class="col-md-2">
+    <img class="img-responsive" src="netdev{{ file.front.url }}" alt="{{ file.name }}" title="{{ file.name }}"/>
+    </div>
+    <div class="cold-md-8">
+
+        <h3>{{ file.name }}<br><hr><small>{{ file.description }}</small></h3>
+    {% if user == file.author %}
+            <a href="{% url 'edit_file' file.id %}" class="btn btn-default btn-small">
+                Editar
+            </a>
+
+              <a href="{% url 'delete_file' file.id %}" class="btn btn-danger btn-small">
+               <span class=" glyphicon glyphicon-remove"></span>
+                Deletar
+            </a>
+    {% endif %}
+    {% if file.stored_file %}
+            {% if file.public == True or user == file.author %}
+            <a href="netdev/{{ file.stored_file.url }}" class="btn btn-primary btn-small" download><span class="glyphicon glyphicon-download-alt"></span>
+               Baixar ({{ file.human_file_size }})
+            </a>
+            {% else %}
+                </div>
+                <div class="col-md-8">
+                <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>
+            Você não tem permissão para baixar esse arquivo
+        </div>
+            {% endif %}
+    {% else %}
+        <li>{% trans "Não ha download disponivel" %}</li>
+    {% endif %}
+    <h4><small>Data de Publicação: {{ file.pub_date }}<br>
+    Última modificação: {{ file.last_mod }}</small></h4>
+
+    </div>
+    </div>
+    </div>
+    </div>
+
+{% endblock %}

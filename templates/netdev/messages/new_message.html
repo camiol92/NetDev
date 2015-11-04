@@ -9,19 +9,35 @@
         <h1>Minhas Mensagens</h1>
     </div>
     <ul class="nav nav-tabs">
-      <li role="presentation"><a href="{% url 'inbox' %}">Caixa de Entrada</a></li>
-      <li role="presentation"><a href="{% url 'outbox' %}">Caixa de Saída</a></li>
-      <li role="presentation" class="active"><a href="{% url 'new_message' %}">Nova Mensagem</a></li>
+        <li role="presentation"><a href="{% url 'inbox' %}">Caixa de Entrada</a></li>
+        <li role="presentation"><a href="{% url 'outbox' %}">Caixa de Saída</a></li>
+        <li role="presentation"><a href="{% url 'trash' %}">Lixeira</a></li>
+        <li role="presentation" class="active"><a href="{% url 'new_message' %}">Nova Mensagem</a></li>
     </ul>
     <br>
+    <div class="col-md-8">
+    {% if erro %}
+        <div class="alert alert-danger" role="alert">
+                    <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
+                    <span class="sr-only">Erro</span>
+                    {{ erro }}
+                </div>
+    {% endif %}
+        <form id="send_message" method="post" action="">
+            <label for="recipient">Para</label>
+            <input class="form-control" value="{{ to }}" id="recipient" maxlength="100" name="recipient"
+                   type="text" autofocus=""/>
+            <label for="inputTitle">Assunto</label>
+            <input class="form-control" value="{{ title }}" id="inputTitle" maxlength="100" name="subject"
+                   type="text" autofocus=""/>
+            <label for="inputText">Texto</label>
+                        <textarea class="form-control" rows="10" id="inputText" name="body"
+                                  autofocus="">{{ text }}</textarea>
+            <br>
 
-    <label for="inputTitle">Assunto</label>
-                        <input class="form-control" value="" id="inputTitle" maxlength="100" name="location"
-                               type="text" autofocus=""/>
-                        <label for="inputText">Texto</label>
-                        <textarea class="form-control" rows="10" id="inputText" name="academics"
-                                  autofocus="">message.title</textarea>
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit" value="Send Message">Enviar Mensagem</button>
+        </form>
 
-
-
+    </div>
 {% endblock %}

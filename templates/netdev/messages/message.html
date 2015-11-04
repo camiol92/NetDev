@@ -11,10 +11,12 @@
     <ul class="nav nav-tabs">
         <li role="presentation"><a href="{% url 'inbox' %}">Caixa de Entrada</a></li>
         <li role="presentation"><a href="{% url 'outbox' %}">Caixa de Saída</a></li>
+        <li role="presentation"><a href="{% url 'trash' %}">Lixeira</a></li>
         <li role="presentation"><a href="{% url 'new_message' %}">Nova Mensagem</a></li>
     </ul>
     <br>
-    <div class="col-md-10">
+    <div class="row">
+    <div class="col-md-8">
  <div class="alert alert-info" role="alert">
   <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
   <strong>De: {{ message.sender }}</strong>, em {{ message.date }}
@@ -26,5 +28,16 @@
         <br><br>Texto<br>
             <small>{{ message.text }}</small>
         </h3>
+
     </div>
+        <form id="new_message" method="post" action="{% url 'new_message' %}">
+            {% csrf_token %}
+            <input type="hidden" name="to" value="{{ message.recipient }}">
+            <input type="hidden" name="from" value="{{ message.sender }}">
+            <input type="hidden" name="text" value="{{ message.text }}">
+            <input type="hidden" name="title" value="{{ message.title }}">
+        <button class="btn btn-primary" type="submit" name="answer">Responder</button><br><br><br>
+        <button class="btn btn-primary" type="submit" name="forward">Encaminhar</button>
+    </form></div>
+
 {% endblock %}

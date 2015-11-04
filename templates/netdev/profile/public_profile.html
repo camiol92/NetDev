@@ -1,0 +1,94 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Index{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>{{ public_user.username }}</h1>
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="active"><a href="{% url 'public_profile' public_user.username %}">Perfil de Usuário</a></li>
+        <li role="presentation"><a href="{% url 'profile_status' public_user.username %}">Publicações</a></li>
+        <li role="presentation"><a href="{% url 'profile_friends' public_user.username %}">Amigos</a></li>
+    <li role="presentation"><a href="{% url 'public_repository' public_user.username %}">Repositório</a></li>
+
+    </ul>
+    <br>
+    <div class="row">
+        <div class="media col-md-3">
+            <div class="media-left">
+                <a href="/netdev/{{ MEDIA_URL }}{{ public_user_general.picture }}">
+                    <img class="img-responsive" src="/netdev/{{ MEDIA_URL }}{{ public_user_general.picture }}"
+                         alt="profile_image">
+                </a>
+            </div>
+        </div>
+        <h2>{{ public_user_general.display_name }} | {{ public_user_general.gender }}</h2>
+
+        <h2>
+            <small>Membro desde: {{ public_user_general.creation_date }}</small>
+        </h2>
+    {% if public_user == user %}
+        <a class="btn btn-primary" href="{% url 'change_profile' %}"> Editar Perfil</a>
+    {% endif %}
+        <br>
+        {% if public_user != user %}
+            {% if not is_friend %}
+                <form id="friend_form" method="post" action="{% url 'confirm_friendship' public_user %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary" name="add_friend" value="{{ public_user }}"
+                            aria-label="User">
+                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>Adicionar
+                    </button>
+                </form>
+            {% else %}
+                <form id="friend_form" method="post" action="{% url 'remove_friendship' public_user %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary" name="add_friend" value="{{ public_user }}"
+                            aria-label="User">
+                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>Remover
+                    </button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+    <br>
+    <div class="col-md-8">
+        <h3>Localização<br>
+            {% if public_user_profile.location %}
+                <small>{{ public_user_profile.location }}</small>
+            {% else %}
+                <small>Informação Inexistente</small>
+            {% endif %}
+        </h3>
+        <h3>Ocupação/Profissão<br>
+            {% if public_user_profile.job %}
+                <small>{{ public_user_profile.job }}</small>
+            {% else %}
+                <small>Informação Inexistente</small>
+            {% endif %}
+        </h3>
+        <h3>Formação Acadêmica<br>
+            {% if public_user_profile.academics %}
+                <small>{{ public_user_profile.academics }}</small>
+            {% else %}
+                <small>Informação Inexistente</small>
+            {% endif %}
+        </h3>
+        <h3>Experiência<br>
+            {% if public_user_profile.experience %}
+                <small>{{ public_user_profile.experience }}</small>
+            {% else %}
+                <small>Informação Inexistente</small>
+            {% endif %}
+        </h3>
+        <h3>Tags<br>
+            <small>{{ public_user_profile.tags }}</small>
+        </h3>
+    </div>
+
+{% endblock %}
+

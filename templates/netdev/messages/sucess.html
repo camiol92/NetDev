@@ -1,0 +1,31 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Caixa de Entrada{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>Minhas Mensagens</h1>
+    </div>
+    <ul class="nav nav-tabs">
+        <li role="presentation"><a href="{% url 'inbox' %}">Caixa de Entrada</a></li>
+        <li role="presentation"><a href="{% url 'outbox' %}">Caixa de Saída</a></li>
+        <li role="presentation"><a href="{% url 'trash' %}">Lixeira</a></li>
+        <li role="presentation"><a href="{% url 'new_message' %}">Nova Mensagem</a></li>
+    </ul>
+    <br>
+    <div class="row">
+    <div class="col-md-8">
+                 <div class="alert alert-success" role="alert">
+                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                    <span class="sr-only">Mensagem Enviada</span>
+                    Mensagem enviada com sucesso!
+                </div>
+            <a href="{% url 'outbox' %}" class="btn btn-primary" name="back">
+        <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>Voltar
+    </a>
+    </div>
+    </div>
+
+{% endblock %}

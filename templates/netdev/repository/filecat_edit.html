@@ -1,0 +1,32 @@
+{% extends "netdev/base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block title %}Criar Diretório{% endblock %}
+
+{% block body_block %}
+ <div class="page-header">
+        <h1>Criar Diretorio</h1>
+    </div>
+   <ul class="nav nav-tabs">
+        <li role="presentation"><a href="{% url 'repository_index' %}">Início</a></li>
+        <li role="presentation"><a href="{% url 'category_list' %}">Diretórios</a></li>
+        <li role="presentation"><a href="{% url 'add_file' %}">Adicionar Arquivo</a></li>
+        <li role="presentation" class="active"><a href="{% url 'add_filecat' %}">Novo Diretório</a></li>
+    </ul>
+
+    <div class="row">
+        <div class="col-md-8">
+            <form enctype="multipart/form-data" action="" method="post">
+                <br>
+                {% csrf_token %}
+
+                {% bootstrap_form form %}
+
+                <hr>
+                <input class="btn btn-small btn-primary " type="submit" value="Salvar" />
+            </form>
+        </div>
+    </div>
+{% endblock %}
+

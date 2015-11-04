@@ -1,0 +1,38 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Editar Postagem{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>Editar Publicação</h1>
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li role="presentation"><a href="{% url 'public_profile' user.username %}">Perfil de Usuário</a></li>
+        <li role="presentation" class="active"><a href="{% url 'profile_status' user.username %}">Publicações</a></li>
+        <li role="presentation"><a href="{% url 'profile_friends' user.username %}">Amigos</a></li>
+        <li role="presentation"><a href="{% url 'public_repository' public_user.username %}">Repositório</a></li>
+
+    </ul>
+    <br>
+        <form role="form" class="form-signin" id="edit_status" method="post" action="">
+            <div class="row">
+                <div class="col-md-8">
+                    {% csrf_token %}
+                        <label for="inputText">Texto</label>
+                        <textarea class="form-control" rows="2" id="inputText" name="body"
+                                  autofocus="">{{ update.text }}</textarea>
+                </div>
+            </div>
+            <br>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <button class="btn btn-primary btn-block" type="submit">Salvar Alterações</button>
+                </div>
+            </div>
+        </form>
+
+{% endblock %}

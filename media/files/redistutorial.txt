@@ -1,0 +1,23 @@
+ Baixe o 1o:
+  https://github.com/rgl/redis/downloads
+
+ Run redis-server.exe to run the server and redis-cli.exe to connect to this server through the shell.
+
+ Baixar o Redis do site oficiail e rodar.
+
+ #download django-redis and run python setup.py install
+ download redis_wrap1.4.5 and run python setup.py install
+ download redis-py-masters and run python setup.py install
+ --> resn-master esta adicionado cru ao projeto
+
+ Settings PyCharm:
+ Django 1.7.7
+ django-redis 4.1.0
+ msgpack-python 0.4.6
+ pip 1.5.6
+ redis 2.10.3
+ redis-wrap 1.4.5
+ setuptools 7.0
+
+
+ 

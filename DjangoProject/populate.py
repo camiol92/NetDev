@@ -18,7 +18,7 @@ def populate():
 
     sub_geral_1 = add_subforum('Regras', forum_general, 'Subforum para Regras')[0]
     cat_geral_1 = add_category('Gerais', sub_geral_1, 'Categoria de Regras gerais')[0]
-    moderador = add_user('moderador','moderador@netdev.com','mod','Moderador','Quartel General', 'Male')
+    moderador = add_user('moderador','moderador@netdev.com.br','mod','Moderador','Quartel General', 'Male')
     add_topic('Fixado', 'texto fixado', cat_geral_1, moderador)
 
     cat_intel = add_category('Intel', subforum_hw_processors,  'Forum para discutir processadores intel')[0]

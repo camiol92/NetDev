@@ -21,6 +21,17 @@ TEMPLATE_DIRS = (
     TEMPLATE_PATH,
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.contrib.messages.context_processors.messages",
+    "django.core.context_processors.request",
+)
+
+
 #cooekis settings
 # SESSION_COOKIE_AGE = 604800
 #
@@ -96,7 +107,7 @@ DATABASE_PATH = os.path.join(PROJECT_PATH, 'netdev.db')
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
@@ -115,6 +126,12 @@ STATIC_PATH = os.path.join(PROJECT_PATH,'static')
 
 STATICFILES_DIRS = (
     STATIC_PATH,
+)
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 MEDIA_URL = '/media/'

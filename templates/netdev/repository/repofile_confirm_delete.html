@@ -1,0 +1,41 @@
+{% extends "netdev/base.html" %}
+{% load i18n %}
+
+{% block title %}Deletar Arquivo{% endblock %}
+
+{% block body_block %}
+
+    <div class="page-header">
+        <h1>Deletar Arquivo: {{ file.name }}</h1>
+    </div>
+    <ul class="nav nav-tabs">
+        <li role="presentation"><a href="{% url 'repository_index' %}">Início</a></li>
+        <li role="presentation"><a href="{% url 'category_list' %}">Diretórios</a></li>
+        <li role="presentation"><a href="{% url 'add_file' %}">Adicionar Arquivo</a></li>
+        <li role="presentation"><a href="{% url 'add_filecat' %}">Novo Diretório</a></li>
+    </ul>
+
+<br>
+
+      <div>
+        <form role="form" class="form-signin" id="login_form" method="post" action="">
+            <div class="row">
+                <div class="col-md-8">
+                    {% csrf_token %}
+                    {% if file %}
+                        <input type="hidden" name="file_id" value="{{ file.id }}"/>
+                        <div class="alert alert-danger" role="alert">
+                          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                          <span class="sr-only">Aviso:</span>
+                         Tem certeza que quer remover o arquivo "{{ file.name }}"?
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <br>
+             <a href="{% url 'repository_index' %}" class="btn btn-danger btn-small">&laquo; Voltar</a>
+                <input class="btn btn-small btn-primary " type="submit" value="Confirmar" />
+        </form>
+    </div>
+
+{% endblock %}

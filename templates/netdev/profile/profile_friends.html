@@ -1,0 +1,61 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Index{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>{{ public_user.username }}</h1>
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li role="presentation"><a href="{% url 'public_profile' public_user.username %}">Perfil de Usuário</a></li>
+        <li role="presentation"><a href="{% url 'profile_status' public_user.username %}">Publicações</a></li>
+        <li role="presentation" class="active"><a href="{% url 'profile_friends' public_user.username %}">Amigos</a></li>
+        <li role="presentation"><a href="{% url 'public_repository' public_user.username %}">Repositório</a></li>
+
+    </ul>
+    <br>
+     {% for user in users %}
+        <div class="col-md-4">
+        {% if user.is_friend %}
+            <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="row">
+                    <a href="{% url 'public_profile' user.user %}">
+                        <div class="col-md-7" style="color:white"><strong>{{ user.user.username }}</strong></div>
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="panel panel-info">
+            <div class="panel-heading">
+                <div class="row">
+                    <a href="{% url 'public_profile' user.user %}">
+                        <div class="col-md-7"><strong>{{ user.user.username }}</strong></div>
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+            <div class="panel-body">
+                <div class="col-md-6">
+                    <h4>{{ user.user.display_name }}</h4>
+                    <a href="{% url 'public_profile' user.user %}">
+                        <img class="img-responsive" src="/netdev{{ MEDIA_URL }}{{ user.profile.picture }}"
+                             alt="profile_image">
+                    </a>
+                    </div>
+                <div class="col-md-6">
+                    <h3>{{ user.profile.display_name }}</h3>
+                    <small>Membro desde:
+                    <br>{{ user.user.date_joined.day }}-{{ user.user.date_joined.month }}-{{ user.user.date_joined.year }}</small>
+                </div>
+            </div>
+        </div>
+        </div>
+    {% endfor %}
+
+
+{% endblock %}
+

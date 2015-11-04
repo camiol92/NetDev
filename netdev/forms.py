@@ -1,8 +1,10 @@
 __author__ = 'Cami'
 
 from django import forms
+from django.http.request import QueryDict
 from django.contrib.auth.models import User
-from netdev.models import UserProfile, Topic, Post
+from netdev.models import UserProfile, Topic, Post, Message, RepoFile, FileCategory
+
 import datetime
 
 class UserForm(forms.ModelForm):
@@ -26,6 +28,24 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ('body',)
+
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ('title', 'text', 'recipient', 'sender')
+
+class RepoFileForm(forms.ModelForm):
+
+    class Meta:
+        model = RepoFile
+        fields = ('name', 'description', 'stored_file', 'front', 'category', 'public')
+
+class FileCategoryForm(forms.ModelForm):
+
+    class Meta:
+        model = FileCategory
+        exclude = ('owner',)
+
 
 # class TopicForm(forms.ModelForm):
 #     title = forms.CharField(max_length=128, help_text="Por favor digite o Assunto do seu topico.")

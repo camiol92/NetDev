@@ -1,0 +1,90 @@
+{% extends "netdev/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Files in" %} {{ current_category.name }}{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>Diretório: {{ category.name }}</h1>
+    </div>
+  <ul class="nav nav-tabs">
+        <li role="presentation"><a href="{% url 'repository_index' %}">Início</a></li>
+        <li role="presentation"><a href="{% url 'category_list' %}">Diretórios</a></li>
+        <li role="presentation"><a href="{% url 'add_file' %}">Adicionar Arquivo</a></li>
+        <li role="presentation"><a href="{% url 'add_filecat' %}">Novo Diretório</a></li>
+ </ul>
+    <br>
+    <div class="col-md-12">
+    <div class="panel panel-primary">
+    <div class="panel-body">
+    <div class="cold-md-8">
+
+        <h3>{{ category.name }}<br><hr><small>{{ category.description }}</small></h3>
+    {% if user == category.owner %}
+            <a href="{% url 'category_edit' category.id %}" class="btn btn-default btn-small">
+                Editar
+            </a>
+
+              <a href="{% url 'category_delete' category.id %}" class="btn btn-danger btn-small">
+               <span class=" glyphicon glyphicon-remove"></span>
+                Deletar
+            </a>
+    {% endif %}
+
+    <h4><small>Data de Publicação: {{ category.pub_date }}<br>
+    Última modificação: {{ category.last_mod }}</small></h4>
+
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <br>
+    <div class="row container-fluid">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        Arquivos
+                    </div>
+                    <div class="panel-body">
+                        {% if not files %}
+                            <div class="alert alert-warning" role="alert">
+                          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                          <span class="sr-only">Aviso:</span>
+                         Ainda não existe arquivos nesse diretório!
+                        </div>
+                        {% else %}
+                            {% for object in files %}
+                                    <div class="col-md-4">
+                                        <div class="panel panel-primary">
+                                            <div class="panel-body">
+                                                <div class="col-md-3">
+                                                    <a href="{% url 'view_file' object.id %}"><img
+                                                            class="img-responsive"
+                                                            src="netdev/{{ object.front.url }}"
+                                                            alt="File image"
+                                                            title="{{ object.name }}"/></a>
+                                                </div>
+                                                <div class="col-md-8"><strong><a
+                                                        href="{% url 'view_file' object.id %}">{{ object.name }}</a></strong>
+
+                                                    <p>{{ object.description|truncatewords:10 }}...</p></div>
+                                                {% if object.public %}
+                                                    <span class="glyphicon glyphicon-eye-open"
+                                                          aria-hidden="true"></span>
+                                                {% else %}<span class="glyphicon glyphicon-eye-close"
+                                                                aria-hidden="true"></span>
+
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+    </div>
+
+{% endblock %}

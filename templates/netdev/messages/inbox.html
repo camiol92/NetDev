@@ -5,38 +5,58 @@
 {% block title %}Caixa de Entrada{% endblock %}
 
 {% block body_block %}
+
+<script language="JavaScript">
+function toggle(source) {
+  checkboxes = document.getElementsByName('message');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = source.checked;
+  }
+}
+</script>
+
     <div class="page-header">
         <h1>Minhas Mensagens</h1>
     </div>
     <ul class="nav nav-tabs">
       <li role="presentation" class="active"><a href="{% url 'inbox' %}">Caixa de Entrada</a></li>
       <li role="presentation"><a href="{% url 'outbox' %}">Caixa de Saída</a></li>
+        <li role="presentation"><a href="{% url 'trash' %}">Lixeira</a></li>
       <li role="presentation"><a href="{% url 'new_message' %}">Nova Mensagem</a></li>
+
     </ul>
     <br>
+    <form id="checkall" action="{% url 'inbox' %}" method="post">
+    {% csrf_token %}
     <div class="panel panel-primary">
         <!-- Default panel contents -->
         <div class="panel-heading">
             <div class="row">
-                <div class="col-md-6">Assunto</div>
-                <div class="col-md-2 text-center">Remetente</div>
-                <div class="col-md-4 text-center">Data</div>
+                <div class="col-md-4">Assunto</div>
+                <div class="col-md-2 text-right">Remetente</div>
+                <div class="col-md-3 text-right">Data</div>
+                 <div class="col-md-2 text-right">Selecionar Todos</div>
+            <input type="checkbox" onClick="toggle(this)" />
               </div>
+
         </div>
+
             {% if inbox %}
                 <ul class="list-group">
                     {% for message in inbox %}
                         <li class="list-group-item">
                             <div class="row">
-                                <div class="col-md-6"><a href="{% url 'message' message.id %}">{{ message.title }}</a></div>
-                                <div class="col-md-2 text-center">{{ message.sender }}</div>
-                                <div class="col-md-4 text-center">{{ message.date }}</div>
+                                <div class="col-md-5"><a href="{% url 'message' message.id %}">{{ message.title }}</a></div>
+                                <div class="col-md-3">{{ message.sender }}</div>
+                                <div class="col-md-3">{{ message.date }}</div>
+                                <input type="checkbox" name="message" value="{{ message.id }}" />
                             </div>
                         </li>
                     {% endfor %}
                 </ul>
-            </div>
+                </div>
 
+                <button class="btn btn-primary" type="submit" name="delete">Deletar Selecionados</button>
 
         {% else %}
                 </div>
@@ -47,5 +67,5 @@
 
         {% endif %}
 
-
+    </form>
 {% endblock %}

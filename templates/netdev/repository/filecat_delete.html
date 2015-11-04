@@ -1,0 +1,42 @@
+{% extends "netdev/base.html" %}
+{% load i18n %}
+
+{% block title %}Deletar Diretório{% endblock %}
+
+{% block body_block %}
+
+    <div class="page-header">
+        <h1>Deletar: {{ category.name }}</h1>
+    </div>
+    <ul class="nav nav-tabs">
+        <li role="presentation"><a href="{% url 'repository_index' %}">Início</a></li>
+        <li role="presentation"><a href="{% url 'category_list' %}">Diretórios</a></li>
+        <li role="presentation"><a href="{% url 'add_file' %}">Adicionar Arquivo</a></li>
+        <li role="presentation"><a href="{% url 'add_filecat' %}">Novo Diretório</a></li>
+    </ul>
+
+<br>
+      <div>
+        <form role="form"  method="post" action="">
+            <div class="row">
+                <div class="col-md-8">
+                    {% csrf_token %}
+                    {% if category %}
+                        <input type="hidden" name="category_id" value="{{ category.id }}"/>
+                        <div class="alert alert-danger" role="alert">
+                          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                          <span class="sr-only">Aviso:</span>
+                         Tem certeza que quer remover o diretório "{{ category.name }}"? Isso também ira deletar todos os arquivos dentro deste repositório!
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <br>
+
+             <a href="{% url 'repository_index' %}" class="btn btn-danger btn-small">&laquo; Voltar</a>
+                <input class="btn btn-small btn-primary " type="submit" value="Confirmar" />
+        </form>
+    </div>
+
+{% endblock %}
+l>
