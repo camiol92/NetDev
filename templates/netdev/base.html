@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="">
@@ -18,91 +18,96 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-  </head>
+</head>
 
-    <body>
-       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-      <div class="container-fluid">
+<body>
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse" aria-expanded="false">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse"
+                    aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
             {% if user.is_authenticated %}
                 <a class="navbar-brand" href="/netdev/">Início</a>
                 <a class="navbar-brand" href="{% url 'foruns' %}">Fórum</a>
-{#                 <a class="navbar-brand" href="{% url 'repositorys' %}">Repositórios</a>#}
-{#                <a class="navbar-brand" href="{% url 'users' %}">Usuários</a>#}
+                <form class="navbar-form navbar-left" role="search" action="{% url 'users' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="search" placeholder="Pesquisar Usuarios...">
+                    </div>
+                    <button type="submit" class="btn btn-primary" aria-label="Left Align">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                    </button>
+                </form>
+                {#                 <a class="navbar-brand" href="{% url 'repositorys' %}">Repositórios</a>#}
+                {#                <a class="navbar-brand" href="{% url 'users' %}">Usuários</a>#}
             {% else %}
                 <a class="navbar-brand" href="/netdev/">NetDev</a>
             {% endif %}
         </div>
 
-      <form class="navbar-form navbar-left" role="search" action="{% url 'users' %}" method="post">
-          {% csrf_token %}
-        <div class="form-group">
-          <input type="text" class="form-control" name="search" placeholder="Pesquisar Usuarios...">
-        </div>
-      <button type="submit" class="btn btn-primary" aria-label="Left Align">
-    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-    </button>
-      </form>
+
         <div class="navbar-collapse collapse">
 
-          <ul class="nav navbar-nav navbar-right">
-              <li><a href="{% url 'about' %}">Sobre</a> </li>
-             {% if user.is_authenticated %}
-                 <li><a href="{% url 'logout' %}?next=/netdev/">Sair</a></li>
-             {% else %}
-                 <li><a href="{% url 'login' %}">Entrar</a></li>
-                 <li><a href="{% url 'register' %}">Registrar</a></li>
-             {% endif %}
-           </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="{% url 'about' %}">Sobre</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'logout' %}?next=/netdev/">Sair</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Entrar</a></li>
+                    <li><a href="{% url 'register' %}">Registrar</a></li>
+                {% endif %}
+            </ul>
         </div>
-      </div>
     </div>
-       {% if user.is_authenticated %}
- <div class="container-fluid main">
-      <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
-             <div class="media">
-              <div class="media-left">
+</div>
+{% if user.is_authenticated %}
+    <div class="container-fluid main">
+    <div class="row">
+    <div class="col-sm-3 col-md-2 sidebar">
+        <div class="media">
+            <div class="media-left">
                 {% if user_profile.picture %}
                     <a href="/netdev{{ MEDIA_URL }}{{ user_profile.picture }}">
-                        <img class="img-responsive" src="/netdev{{ MEDIA_URL }}{{ user_profile.picture }}"alt="profile_image">
+                        <img class="img-responsive" src="/netdev{{ MEDIA_URL }}{{ user_profile.picture }}"
+                             alt="profile_image">
                     </a>
-                    {% else %}
+                {% else %}
 
                     <a href="/netdev{{ MEDIA_URL }}profile_images/default_avatar.png">
-                        <img class="img-responsive" src="/netdev{{ MEDIA_URL }}profile_images/default_avatar.png"alt="profile_image">
-                     </a>
-                    {% endif %}
-              </div>
-                 {% block side_bar %}<h3><p class="text-center">{{ user_profile.display_name }}</p></h3>{% endblock %}
-        <ul class="list-group">
-            <a href="{% url 'repository_index' %}" class="list-group-item">Meu Repositório</a>
-            <a href="{% url 'my_topics' %}" class="list-group-item">Meus Tópicos</a>
-             <a href="{% url 'public_profile' user.username %}" class="list-group-item">Perfil</a>
-            <a href="{% url 'inbox' %}" class="list-group-item">Mensagens</a>
+                        <img class="img-responsive" src="/netdev{{ MEDIA_URL }}profile_images/default_avatar.png"
+                             alt="profile_image">
+                    </a>
+                {% endif %}
+            </div>
+            {% block side_bar %}
+                <h3><p class="text-center">{{ user_profile.display_name }}</p></h3>{% endblock %}
+            <ul class="list-group">
+                <a href="{% url 'repository_index' %}" class="list-group-item">Meu Repositório</a>
+                <a href="{% url 'my_topics' %}" class="list-group-item">Meus Tópicos</a>
+                <a href="{% url 'public_profile' user.username %}" class="list-group-item">Perfil</a>
+                <a href="{% url 'inbox' %}" class="list-group-item">Mensagens</a>
         </div>
-        </div>
-      {% endif %}
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-           <div>
-                {% block body_block %}{% endblock %}
-                </div>
-        </div>
-      </div>
     </div>
+{% endif %}
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+    <div>
+        {% block body_block %}{% endblock %}
+    </div>
+</div>
+</div>
+</div>
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
-  </body>
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+</body>
 </html>
