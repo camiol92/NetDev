@@ -4,9 +4,10 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from datetime import datetime
 
 #from fields import StdImageField
-from taggit.managers import TaggableManager
+#from taggit.managers import TaggableManager
 #
 # class State(models.Model):
 #     name = models.TextField()
@@ -21,6 +22,10 @@ from taggit.managers import TaggableManager
 #     def __unicode__(self):
 #         return self.name
 
+INF_TIME = datetime.max.replace(tzinfo=timezone.utc)
+
+def get_inf_time():
+    return INF_TIME
 
 class UserProfile(models.Model):
     # This line is required. Links UserProfile to a User model instance.
@@ -35,7 +40,7 @@ class UserProfile(models.Model):
     display_name = models.CharField(max_length=100)
     picture = models.ImageField(upload_to='profile_images', default='profile_images/default_avatar.png')
     gender = models.CharField('gender', max_length=1, choices=GENDER_CHOICES)
-    creation_date = models.DateTimeField(default=timezone.get_current_timezone().normalize(timezone.now().astimezone(timezone.get_current_timezone())))
+    creation_date = models.DateTimeField(default=get_inf_time)
 
     # Override the __unicode__() method to return out something meaningful!
     def __unicode__(self):
@@ -60,7 +65,7 @@ class PublicProfile(models.Model):
 
 class StatusUpdate(models.Model):
     user = models.ForeignKey(User)
-    date = models.DateTimeField(default=timezone.get_current_timezone().normalize(timezone.now().astimezone(timezone.get_current_timezone())))
+    date = models.DateTimeField(default=get_inf_time)
     text = models.TextField()
 
     def __unicode__(self):
@@ -78,7 +83,8 @@ class Message(models.Model):
     sender = models.ForeignKey(User, related_name="sender")
     title = models.CharField(max_length=255, null=True)
     text = models.TextField()
-    date = models.DateTimeField(default=timezone.get_current_timezone().normalize(timezone.now().astimezone(timezone.get_current_timezone())))
+ #   date = models.DateTimeField(default=timezone.get_current_timezone().normalize(timezone.now().astimezone(timezone.get_current_timezone())))
+    date = models.DateTimeField(default=get_inf_time)
     is_trash = models.BooleanField(default=False)
 
     def __unicode__(self):
@@ -155,7 +161,7 @@ class Topic(models.Model):
     text = models.TextField()
     views = models.IntegerField(default=0)
     replies = models.IntegerField(default=0)
-    creation_date = models.DateTimeField(default=timezone.get_current_timezone().normalize(timezone.now().astimezone(timezone.get_current_timezone())))
+    creation_date = models.DateTimeField(default=get_inf_time)
     is_closed = models.BooleanField(_("Is closed"), default=False)
 
     class Meta:
@@ -171,7 +177,7 @@ class Post(models.Model):
     topic = models.ForeignKey(Topic, related_name='posts')
     body = models.TextField(_("Body"))
     views = models.IntegerField(default=0)
-    creation_date = models.DateTimeField(default=timezone.get_current_timezone().normalize(timezone.now().astimezone(timezone.get_current_timezone())))
+    creation_date = models.DateTimeField(default=get_inf_time)
     created = models.DateTimeField(_("Created"), auto_now_add=True)
     updated = models.DateTimeField(_("Updated"), auto_now=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='forum_posts')
