@@ -215,7 +215,7 @@ class RepoFile(models.Model):
     name = models.CharField(_('Nome'), max_length=250,
         help_text=_('Esse vai ser o nome visivel do arquivo.'))
     description = models.TextField(_('Descricao do arquivo'))
-    front = models.ImageField(_('Imagem para o arquivo'),upload_to='images/', blank=True, null=True, default='images/file_icon.png') #size=(150, 200, True)
+    front = models.ImageField(_('Imagem para o arquivo'),upload_to='images/', help_text=('Imagem opcional') ,default='images/file_icon.png') #size=(150, 200, True)
     stored_file = models.FileField(upload_to='files/', verbose_name=_('Arquivo'),
         help_text=_('Tamanho maximo 104Mb'), blank=True, null=True)
     category = models.ForeignKey(FileCategory, verbose_name=_('Selecione o Diretorio'), related_name='files')
