@@ -51,7 +51,7 @@ DATABASE_PATH = os.path.join(PROJECT_PATH, 'netdev.db')
 SECRET_KEY = '&u#=aek)j+$_-nbj91m+ipr5)so)e)2r+56dl*ix@idy8h5gw3'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 TEMPLATE_DEBUG = True
 
@@ -133,5 +133,5 @@ STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-MEDIA_URL = '/media/'
+MEDIA_URL = '/netdev/media/'
 MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media') # Absolute path to the media directory
