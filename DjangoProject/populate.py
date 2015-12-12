@@ -7,9 +7,12 @@ import django
 def populate():
 
     forum_general = add_forum('Geral',  'Forum para discussoes gerais')[0]
-    forum_software = add_forum('Software', 'Forum para discossoes de SW')[0]
-    forum_recruiting = add_forum('Recrutamento', 'Forum para divulgacaoo de vagas e curriculos')[0]
-    forum_events = add_forum('Eventos', 'Forum para divulgacao e propostas de eventos')[0]
+    # forum_tech = add_forum('Tecnologia da Informação',  'Forum para discussoes referentes ao ramo de TI')[0]
+    # forum_social = add_forum('Social',  'Forum para recrutamento, formação de amizades e parcerias')[0]
+    # forum_tech = add_forum('Tecnologia da Informacao',  'Forum para discussoes referentes ao ramo de TI')[0]
+    # forum_software = add_forum('Software', 'Forum para discossoes de SW')[0]
+    # forum_recruiting = add_forum('Recrutamento', 'Forum para divulgacaoo de vagas e curriculos')[0]
+    # forum_events = add_forum('Eventos', 'Forum para divulgacao e propostas de eventos')[0]
     forum_hardware = add_forum('Hardware', 'Forum para discossoes de HW')[0]
 
     subforum_hw_processors = add_subforum('Processadores', forum_hardware,  'Forum para discussao de processadores')[0]

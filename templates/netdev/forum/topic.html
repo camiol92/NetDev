@@ -39,8 +39,11 @@
                         <a href="{% url 'public_profile' topic.user %}">
                         <img class="img-responsive" src="/netdev{{ MEDIA_URL }}{{ topic_user.picture }}"alt="profile_image">
                     </a>
-
+                        {% if topic_user_public.job %}
+                            <br>Ocupação: <br>{{ topic_user_public.job }}
+                        {% else %}
                         <br>Membro desde: <br>{{ topic.user.date_joined.day }}-{{ topic.user.date_joined.month }}-{{ topic.user.date_joined.year }}
+                        {% endif %}
                     </div>
                     <div class="col-md-10">{{ topic.text }}</div>
                 </div>
@@ -80,7 +83,12 @@
                         <a href="{% url 'public_profile' post.user %}">
                         <img class="img-responsive" src="/netdev{{ MEDIA_URL }}{{ post.user.picture }}"alt="profile_image">
                     </a>
+                        {% if post.public_profile.job %}
+                            <br>Ocupação: <br>{{ post.public_profile.job }}
+                        {% else %}
                         <br>Membro desde: <br>{{ post.post.user.date_joined.day }}-{{ post.post.user.date_joined.month }}-{{ post.post.user.date_joined.year }}
+                        {% endif %}
+
                     </div>
                             <div class="col-md-10">{{ post.post.body }}</div>
                         </div>
@@ -92,7 +100,7 @@
                     <span class="sr-only">Aviso</span>Esse tópico ainda não tem respostas!
                 </div>
             {% endif %}
-            <form class="new-answer" method="post" action="nova_resposta/">
+            <form class="new-answer" method="get" action="nova_resposta/">
                 {% csrf_token %}
                 <button class="btn btn-primary" name="oi" type="submit" value="Submit">
                 Nova Resposta</button>

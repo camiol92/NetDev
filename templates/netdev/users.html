@@ -2,12 +2,20 @@
 
 {% load staticfiles %} <!-- New line -->
 
-{% block title %}Index{% endblock %}
+{% block title %}Usuários{% endblock %}
 
 {% block body_block %}
     <div class="page-header">
-        <h1>Usuarios</h1>
+        <h1>Usuários</h1>
     </div>
+    {% if empty %}
+        <div class="col-md-8">
+  <div class="alert alert-warning" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  <span class="sr-only">Busca Vazia</span>
+  <b>Aviso:</b> Não há nenhum usuário que corresponda a busca "{{ search }}"!
+</div></div>
+    {% else %}
     {% for user in users %}
         <div class="col-md-6">
         {% if user.is_friend %}
@@ -30,20 +38,27 @@
             </div>
         {% endif %}
             <div class="panel-body">
-                <div class="col-md-6">
+                <div class="col-md-7">
                     <h4>{{ user.user.display_name }}</h4>
                     <a href="{% url 'public_profile' user.user %}">
                         <img class="img-responsive" src="/netdev{{ MEDIA_URL }}{{ user.profile.picture }}"
                              alt="profile_image">
                     </a>
                     </div>
-                <div class="col-md-3">
-                    <h3>{{ user.profile.display_name }}</h3>
+                <div class="col-md-5">
+                 <h3>{{ user.profile.display_name }}<br>
+                    {% if user.public_profile.job %}
+                        <small>Ocupação:
+                    <br>{{ user.public_profile.job }}</small>
+                    {% else %}
                     <small>Membro desde:
                     <br>{{ user.user.date_joined.day }}-{{ user.user.date_joined.month }}-{{ user.user.date_joined.year }}</small>
+                    {% endif %}
+                </h3>
                 </div>
             </div>
         </div>
         </div>
     {% endfor %}
+    {% endif %}
 {% endblock %}

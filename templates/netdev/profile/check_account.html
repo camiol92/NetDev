@@ -1,0 +1,29 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Desativar Conta{% endblock %}
+
+{% block body_block %}
+
+        <div class="page-header">
+            <h1>Desativar Conta</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+              <div class="alert alert-danger" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Error:</span>
+                   Tem certeza de que quer desativar sua conta? Você não poderá mais fazer login! Caso deseje voltar atrás, entre em contato com a admistração.
+                </div>
+            </div>
+        </div>
+
+    <a href="{% url 'view_account' %}" class="btn btn-primary" name="back">
+        <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Voltar
+    </a>
+    <a href="{% url 'deactivate_account' %}" class="btn btn-danger" name="back">
+        <span class="glyphicon glyphicon-off" aria-hidden="true"></span> Confirmar
+    </a>
+{% endblock %}
+

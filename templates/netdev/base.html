@@ -37,11 +37,12 @@
                 <form class="navbar-form navbar-left" role="search" action="{% url 'users' %}" method="post">
                     {% csrf_token %}
                     <div class="form-group">
-                        <input type="text" class="form-control" name="search" placeholder="Pesquisar Usuarios...">
+                        <input type="text" class="form-control" name="search" placeholder="Pesquisar usuários...">
                     </div>
-                    <button type="submit" class="btn btn-primary" aria-label="Left Align">
+                    <button type="submit" class="btn btn-primary" aria-label="Left Align" title="bu">
                         <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                     </button>
+                <span style="color:lightgrey; padding-left: 10px">Clique na Lupa para ver todos os usuários</span>
                 </form>
                 {#                 <a class="navbar-brand" href="{% url 'repositorys' %}">Repositórios</a>#}
                 {#                <a class="navbar-brand" href="{% url 'users' %}">Usuários</a>#}
@@ -49,10 +50,15 @@
                 <a class="navbar-brand" href="/netdev/">NetDev</a>
             {% endif %}
         </div>
+
+
         <div class="navbar-collapse collapse">
 
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="{% url 'about' %}">Sobre</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'view_account' %}">Conta</a></li>
+            {% endif %}
+                <li><a href="{% url 'about' %}">Sobre</a>
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'logout' %}?next=/netdev/">Sair</a></li>
                 {% else %}

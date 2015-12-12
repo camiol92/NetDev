@@ -19,6 +19,11 @@ class UserProfileForm(forms.ModelForm):
         model = UserProfile
         fields = ('display_name', 'picture', 'gender')
 
+class UserFormExtra(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('password',)
+
 class TopicForm(forms.ModelForm):
     class Meta:
         model = Topic
@@ -35,16 +40,24 @@ class MessageForm(forms.ModelForm):
         fields = ('title', 'text', 'recipient', 'sender')
 
 class RepoFileForm(forms.ModelForm):
+#    eieiei = forms.CharField(label='Your name')
 
     class Meta:
         model = RepoFile
-        fields = ('name', 'description', 'stored_file', 'front', 'category', 'public')
+        #fields = ('name', 'description', 'stored_file', 'front', 'category', 'public')
+        exclude = ('pub_date', 'last_mod', 'author',)
 
 class FileCategoryForm(forms.ModelForm):
 
     class Meta:
         model = FileCategory
         exclude = ('owner',)
+
+class MessageForm(forms.ModelForm):
+
+    class Meta:
+        model = Message
+        exclude = ('sender',)
 
 
 # class TopicForm(forms.ModelForm):

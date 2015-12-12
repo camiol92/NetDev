@@ -1,11 +1,13 @@
 {% extends "netdev/base.html" %}
 {% load i18n %}
 
-{% block title %}Arquivo: {{ file.name }}{% endblock %}
+{% block title %}Detalhes do Arquivo{% endblock %}
 
 {% block body_block %}
 
-    <div class="page-header">
+
+    {% if user == file.author %}
+            <div class="page-header">
         <h1>Arquivo: {{ file.name }}</h1>
     </div>
     <ul class="nav nav-tabs">
@@ -14,6 +16,18 @@
         <li role="presentation"><a href="{% url 'add_file' %}">Adicionar Arquivo</a></li>
         <li role="presentation"><a href="{% url 'add_filecat' %}">Novo Diretório</a></li>
     </ul>
+    {% else %}
+                    <div class="page-header">
+        <h1>Arquivo de {{ file.author }}</h1>
+    </div>
+            <ul class="nav nav-tabs">
+        <li role="presentation"><a href="{% url 'public_profile' file.author %}">Perfil de Usuário</a></li>
+        <li role="presentation"><a href="{% url 'profile_status' file.author %}">Publicações</a></li>
+        <li role="presentation"><a href="{% url 'profile_friends' file.author %}">Amigos</a></li>
+        <li role="presentation"><a href="{% url 'public_repository' file.author %}">Repositório</a></li>
+
+    </ul>
+    {% endif %}
 
 <br>
     <div class="col-md-12">

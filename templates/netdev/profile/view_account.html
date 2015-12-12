@@ -1,0 +1,42 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Conta{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>Minha Conta</h1>
+    </div>
+    <br>
+    <div class="well">
+        <div class="media col-md-3">
+            <div class="media-left">
+                <a href="/netdev/{{ MEDIA_URL }}{{ public_user_general.picture }}">
+                    <img class="img-responsive" src="/netdev/{{ MEDIA_URL }}{{ public_user_general.picture }}"
+                         alt="profile_image">
+                </a>
+            </div>
+        </div>
+        <div class="col-md-9">
+        <h3>
+            <small>Nome de Exibição:</small>
+            {{ public_user_general.display_name }}
+            <br>
+            <small>Gênero:</small>
+            {{ public_user_general.gender }}
+            <br>
+            <small>Email:</small>
+            {{ public_user.email }}
+        </h3>
+            </div>
+        <div class="container-fluid">
+            <a class="btn btn-primary" href="{% url 'edit_account' %}"> Editar Conta</a>
+            <a class="btn btn-info" href="{% url 'change_password' %}"><span class="glyphicon glyphicon-edit"
+                                                                         aria-hidden="true"></span> Redefinir Senha</a>
+            <a class="btn btn-danger" href="{% url 'check_account' %}"> <span class="glyphicon glyphicon-off" aria-hidden="true"></span> Desativar Conta</a>
+        </div>
+
+    </div>
+{% endblock %}
+

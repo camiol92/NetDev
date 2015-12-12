@@ -1,11 +1,11 @@
 {% extends "netdev/base.html" %}
 {% load i18n %}
 
-{% block title %}Meu Repositório{% endblock %}
+{% block title %}Repositório{% endblock %}
 
 {% block body_block %}
     <div class="page-header">
-        <h1>Repositorio</h1>
+        <h1>Repositório de {{ public_user.username }}</h1>
     </div>
     <ul class="nav nav-tabs">
         <li role="presentation"><a href="{% url 'public_profile' public_user.username %}">Perfil de Usuário</a></li>

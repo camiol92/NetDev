@@ -2,8 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import datetime
-from django.utils.timezone import utc
+import netdev.models
 from django.conf import settings
 
 
@@ -28,12 +27,19 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='City',
+            name='FileCategory',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.TextField()),
+                ('name', models.CharField(help_text='Name of the category. 100 chars maximum.', max_length=100, verbose_name='Nome do Diretorio')),
+                ('description', models.TextField(verbose_name='Descricao do arquivo')),
+                ('pub_date', models.DateTimeField(auto_now_add=True)),
+                ('last_mod', models.DateTimeField(auto_now_add=True)),
+                ('owner', models.ForeignKey(related_name='owner', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
             ],
             options={
+                'ordering': ['name'],
+                'verbose_name': 'FileCategory',
+                'verbose_name_plural': 'FileCategories',
             },
             bases=(models.Model,),
         ),
@@ -67,7 +73,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('title', models.CharField(max_length=255, null=True)),
                 ('text', models.TextField()),
-                ('date', models.DateTimeField(default=datetime.datetime(2015, 10, 24, 14, 59, 26, 144000, tzinfo=utc))),
+                ('date', models.DateTimeField(default=netdev.models.get_inf_time)),
                 ('is_trash', models.BooleanField(default=False)),
                 ('recipient', models.ForeignKey(related_name='recipient', to=settings.AUTH_USER_MODEL)),
                 ('sender', models.ForeignKey(related_name='sender', to=settings.AUTH_USER_MODEL)),
@@ -82,7 +88,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('body', models.TextField(verbose_name='Body')),
                 ('views', models.IntegerField(default=0)),
-                ('creation_date', models.DateTimeField(default=datetime.datetime(2015, 10, 24, 14, 59, 26, 152000, tzinfo=utc))),
+                ('creation_date', models.DateTimeField(default=netdev.models.get_inf_time)),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='Created')),
                 ('updated', models.DateTimeField(auto_now=True, verbose_name='Updated')),
             ],
@@ -107,12 +113,24 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='State',
+            name='RepoFile',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.TextField()),
+                ('name', models.CharField(help_text='Esse vai ser o nome visivel do arquivo.', max_length=250, verbose_name='Nome', error_messages={b'required': b'necessario'})),
+                ('description', models.TextField(verbose_name='Descricao do arquivo')),
+                ('front', models.ImageField(default=b'images/file_icon.png', upload_to=b'images/', null=True, verbose_name='Imagem para o arquivo', blank=True)),
+                ('stored_file', models.FileField(help_text='Tamanho maximo 104Mb', upload_to=b'files/', verbose_name='Arquivo', error_messages={b'erro': b'Adicione um Arquivo'})),
+                ('public', models.BooleanField(default=False, help_text='Selecione para tornar o arquivo publico.', verbose_name='Tornar Publico')),
+                ('pub_date', models.DateTimeField(auto_now_add=True)),
+                ('last_mod', models.DateTimeField(auto_now_add=True)),
+                ('author', models.ForeignKey(related_name='author', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+                ('category', models.ForeignKey(related_name='files', verbose_name='Selecione o Diretorio', to='netdev.FileCategory')),
             ],
             options={
+                'ordering': ['name'],
+                'get_latest_by': 'pubdate',
+                'verbose_name': 'File',
+                'verbose_name_plural': 'Files',
             },
             bases=(models.Model,),
         ),
@@ -120,7 +138,7 @@ class Migration(migrations.Migration):
             name='StatusUpdate',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('date', models.DateTimeField(default=datetime.datetime(2015, 10, 24, 14, 59, 26, 139000, tzinfo=utc))),
+                ('date', models.DateTimeField(default=netdev.models.get_inf_time)),
                 ('text', models.TextField()),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
@@ -150,7 +168,7 @@ class Migration(migrations.Migration):
                 ('text', models.TextField()),
                 ('views', models.IntegerField(default=0)),
                 ('replies', models.IntegerField(default=0)),
-                ('creation_date', models.DateTimeField(default=datetime.datetime(2015, 10, 24, 14, 59, 26, 151000, tzinfo=utc))),
+                ('creation_date', models.DateTimeField(default=netdev.models.get_inf_time)),
                 ('is_closed', models.BooleanField(default=False, verbose_name='Is closed')),
                 ('category', models.ForeignKey(related_name='topics', to='netdev.Category')),
                 ('last_post', models.ForeignKey(related_name='forum_last_post', verbose_name='Last post', blank=True, to='netdev.Post', null=True)),
@@ -165,10 +183,10 @@ class Migration(migrations.Migration):
             name='UserProfile',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('display_name', models.CharField(max_length=100)),
-                ('picture', models.ImageField(default=b'profile_images/default_avatar.png', upload_to=b'profile_images')),
-                ('gender', models.CharField(max_length=1, verbose_name=b'gender', choices=[(b'H', b'Homem'), (b'M', b'Mulher')])),
-                ('creation_date', models.DateTimeField(default=datetime.datetime(2015, 10, 24, 14, 59, 26, 138000, tzinfo=utc))),
+                ('display_name', models.CharField(max_length=100, verbose_name='Nome do Exibicao')),
+                ('picture', models.ImageField(default=b'profile_images/default_avatar.png', upload_to=b'profile_images', verbose_name='Foto de Perfil')),
+                ('gender', models.CharField(max_length=1, verbose_name='Genero', choices=[(b'H', b'Homem'), (b'M', b'Mulher')])),
+                ('creation_date', models.DateTimeField(default=netdev.models.get_inf_time)),
                 ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],
             options={
@@ -185,12 +203,6 @@ class Migration(migrations.Migration):
             model_name='post',
             name='user',
             field=models.ForeignKey(related_name='forum_posts', to=settings.AUTH_USER_MODEL),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='city',
-            name='state',
-            field=models.ForeignKey(to='netdev.State'),
             preserve_default=True,
         ),
         migrations.AddField(

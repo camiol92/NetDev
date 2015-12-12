@@ -2,7 +2,7 @@
 
 {% load staticfiles %} <!-- New line -->
 
-{% block title %}NetDev: Entrar{% endblock %}
+{% block title %}Entrar{% endblock %}
 
 {% block body %}
     <form class="form-signin" id="login_form" method="post" action="/netdev/entrar/">
@@ -11,16 +11,19 @@
         <h2 class="form-signin-heading">Entrar</h2>
 
         <div class="form-group">
-            <label for="inputUsername" class="sr-only">Usuário</label>
+            <label for="inputUsername">Nome de Usuário</label>
             <input class="form-control" placeholder="Usuario" id="inputUsername" maxlength="50" name="username"
                    type="text" required autofocus=""/>
         </div>
         <div class="form-group">
-            <label for="inputPassword" class="sr-only">Password</label>
+            <label for="inputPassword">Senha</label>
             <input type="password" class="form-control" placeholder="Senha" id="inputPassword" name="password" required/>
             {% if erro %}
                 <p class="help-block">Informações inválidas de login!</p>
             {% endif %}
+        {% if desativada %}
+            <p class="help-block">Essa conta esta desativada! Para poder acessá-la novamente, entre em contato com os administradores</p>
+        {% endif %}
         </div>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Entrar</button>
     </form>

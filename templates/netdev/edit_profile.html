@@ -1,0 +1,47 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Editar Perfil{% endblock %}
+
+{% block body_block %}
+
+    <div class="page-header" xmlns="http://www.w3.org/1999/html">
+        <h1>Editar Perfil</h1>
+    </div>
+    <div>
+        <form role="form" class="form-signin" id="profile_form" method="post" action="">
+            <div class="row">
+                <div class="col-md-8">
+                    {% csrf_token %}
+                    {% if user %}
+                        <label for="inputTitle">Emprego</label>
+                        <input class="form-control" value="{{ public_profile.job }}" id="inputTitle" maxlength="100" name="job"
+                               type="text" autofocus=""/>
+                        <label for="inputTitle">Localização</label>
+                        <input class="form-control" value="{{ public_profile.location }}" id="inputTitle" maxlength="100" name="location"
+                               type="text" autofocus=""/>
+                        <label for="inputText">Formação Acadêmica</label>
+                        <textarea class="form-control" rows="10" id="inputText" name="academics"
+                                  autofocus="">{{ public_profile.academics }}</textarea>
+                        <label for="inputText">Experiencia</label>
+                        <textarea class="form-control" rows="10" id="inputText" name="experience"
+                                  autofocus="">{{ public_profile.experience }}</textarea>
+                        <label for="inputText">Tags</label>
+                        <textarea class="form-control" rows="3" id="inputText" name="tags"
+                                  autofocus="">{{ public_profile.tags }}</textarea>
+
+                    {% endif %}
+                </div>
+            </div>
+            <br>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <button class="btn btn-primary btn-block" type="submit">Salvar Alterações</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

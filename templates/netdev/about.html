@@ -2,19 +2,29 @@
 
 {% load staticfiles %}
 
-{% block title %}About{% endblock %}
+{% block title %}Sobre{% endblock %}
 
 {% block body_block %}
     <div class="page-header">
-                <h1>About</h1>
+                <h1>Sobre</h1>
             </div>
             <div>
                 {% if user.is_authenticated %}
             <p></strong>  Voce ja visitou esse site {{ visits }} vezes! <br>
          Seu ultimo acesso foi em {{ last_visit }} </p>
+
             {% else %}
-                    Bem vindo ao NetDev! <br>
+                    <h3>Bem vindo ao NetDev!</h3>
                 {% endif %}
-            <img  width="200" height="100" src="{% static "logo.png" %}" alt="NetDev logo" /> <!-- New line -->
+                    <hr>
+                <h4>Tendo problemas? Fale com nossos administradores!</h4>
+                    <h4><small>Camila Lopes: camiol92@gmail.com</small></h4>
+                    <h4><small>Fabio Rachid: fabiorbap@gmail.com</small></h4>
+            <hr>
+                <h4>Acesse a documentação: <a href="https://sites.google.com/site/netdevtcc/">https://sites.google.com/site/netdevtcc/</a></h4 >
+            <hr>
+            Teve problemas? Acesse a <a href="{% url 'data' %}">Política de Dados</a> e os <a href="{% url 'acceptance' %}">Termos de Aceitação</a>
+                <hr>
+                <a href="https://sites.google.com/site/netdevtcc/"><img width="200" height="100" src="{% static "logo.png" %}" alt="NetDev logo" /></a> <!-- New line -->
             </div>
 {% endblock %}

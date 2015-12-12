@@ -2,7 +2,7 @@
 
 {% load staticfiles %} <!-- New line -->
 
-{% block title %}Index{% endblock %}
+{% block title %}Remover Publicação{% endblock %}
 
 {% block body_block %}
     <div class="page-header">
@@ -11,9 +11,9 @@
 
     <ul class="nav nav-tabs">
         <li role="presentation"><a href="{% url 'public_profile' user.username %}">Perfil de Usuário</a></li>
-        <li role="presentation" class="active"><a href="{% url 'profile_status' user.username %}">Publicações</a></li>
+        <li role="presentation"><a href="{% url 'profile_status' user.username %}">Publicações</a></li>
         <li role="presentation"><a href="{% url 'profile_friends' user.username %}">Amigos</a></li>
-        <li role="presentation"><a href="{% url 'public_repository' public_user.username %}">Repositório</a></li>
+        <li role="presentation"><a href="{% url 'public_repository' user.username %}">Repositório</a></li>
 
     </ul>
     <br>

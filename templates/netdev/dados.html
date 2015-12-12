@@ -1,0 +1,27 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %}
+
+{% block title %}Politica de Dados{% endblock %}
+
+{% block body_block %}
+  <div class="page-header">
+        <h1>Política de Dados</h1>
+    </div>
+    <div class="col-md-8">
+<h4>Privacidade entre Usuários</h4>
+    <p class="text-justify">
+        O usuário poderá selecionar a privacidade de arquivos como “Pública” ou “Privada”. Arquivos públicos podem ser visualizados por qualquer usuário da rede, enquanto que os privados só poderão ser visualizados pelo dono do repositório.
+    </p>
+    <h4>Tratamento dos dados pelos responsáveis na rede</h4>
+        <ul><li>Os dados pessoais do usuário, inseridos por ele mesmo na rede, ficam armazenados no sistema;</li>
+<li>Ninguém que trabalha com o sistema e tem acesso aos dados do usuário pode compartilhá-los, exceto em contextos especiais, como solicitações judiciais, em conformidade com as leis brasileiras. Ações podem ser tomadas sobre os dados do usuário caso estejam infringindo alguma das regras dos termos de aceitação, como a utilização de nomes ofensivos, sendo proibida qualquer ação sobre os dados pelos responsáveis da rede fora deste contexto;</li>
+<li>Caso o usuário queira excluir sua conta do sistema, os dados serão armazenados por 90 dias, caso o usuário tenha cometido algum erro ao excluir sua conta, ou por ela ter sido removida através de atividade maliciosa. Passados os 90 dias, todos os dados relacionados ao usuário serão removidos do sistema, excetuando-se casos como solicitações judiciais que requeiram acesso às informações por mais que 90 dias;</li>
+</ul>
+        <h4>Tratamento dos dados por terceiros que utilizem informações da rede</h4>
+        <ul>
+    <li>Terceiros, como outras redes sociais, que tenham acesso a informações de usuários da rede, devem seguir a política de tratamento de dados pelos responsáveis na rede e notificar explicitamente ao usuário que seus dados serão usados, tendo este a opção de negar o acesso às suas informações;</li>
+<li>Caso o usuário deseje que seus dados sejam completamente removidos de terceiros que os obtiveram através do NetDev, deve notificá-los para que seus dados sejam excluídos. Estes terceiros devem ter liberdade para seguir sua própria política de dados a respeito de exclusões de informação;</li>
+<li>Os responsáveis pelo NetDev pedirão aos terceiros que excluam os dados em seus sistemas, caso estes estejam usando estes dados de forma maliciosa, de forma acidental ou não.</li>
+</ul>
+{% endblock %}

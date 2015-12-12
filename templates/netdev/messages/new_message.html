@@ -2,7 +2,7 @@
 
 {% load staticfiles %} <!-- New line -->
 
-{% block title %}Caixa de Entrada{% endblock %}
+{% block title %}Nova Mensagem{% endblock %}
 
 {% block body_block %}
     <div class="page-header">
@@ -23,10 +23,20 @@
                     {{ erro }}
                 </div>
     {% endif %}
-        <form id="send_message" method="post" action="">
+    <form id="send_message" method="post" action="">
+    {% if friend_list %}
+                    <label for="recipient">Para</label>
+            <select class="form-control" name="recipient" id="recipient" autofocus="">
+            {% for friend in friend_list %}
+                <option value="{{ friend }}">{{ friend }}</option>
+            {% endfor %}
+            </select>
+    {% else %}
+
             <label for="recipient">Para</label>
             <input class="form-control" value="{{ to }}" id="recipient" maxlength="100" name="recipient"
                    type="text" autofocus=""/>
+            {% endif %}
             <label for="inputTitle">Assunto</label>
             <input class="form-control" value="{{ title }}" id="inputTitle" maxlength="100" name="subject"
                    type="text" autofocus=""/>

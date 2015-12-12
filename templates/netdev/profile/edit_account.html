@@ -1,0 +1,37 @@
+{% extends 'netdev/base.html' %}
+{% load bootstrap3 %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Editar Conta{% endblock %}
+
+{% block body_block %}
+
+    <div class="page-header" xmlns="http://www.w3.org/1999/html">
+        <h1>Editar Perfil</h1>
+    </div>
+
+    <div>
+
+        <form role="form" class="form-signin" id="profile_form" method="post" action="" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-8">
+                    {% csrf_token %}
+                    {% if user %}
+
+                         {% bootstrap_form profile_form %}
+
+                    {% endif %}
+                </div>
+            </div>
+            <br>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <button class="btn btn-primary btn-block" type="submit">Salvar Alterações</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

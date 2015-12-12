@@ -1,6 +1,6 @@
 from django.template import RequestContext
 from django.shortcuts import render_to_response, render
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils import timezone
@@ -59,6 +59,14 @@ def create_post(forum_name_url, subforum_name_url, category_name_url, topic_id):
     return HttpResponseRedirect(url)
 
 #view functions
+
+def data(request):
+    context_dict = user_info(request)
+    return render(request, 'netdev/dados.html', context_dict)
+
+def acceptance(request):
+    context_dict = user_info(request)
+    return render(request, 'netdev/aceitacao.html', context_dict)
 
 def register(request):
 
@@ -152,7 +160,7 @@ def user_login(request):
                     return HttpResponseRedirect('/netdev/')
                 else:
                     # An inactive account was used - no logging in!
-                    return HttpResponse("Sua conta NetDev esta desativada.")
+                    return render(request, 'netdev/login.html', {'desativada':True})
             else:
                 # Bad login details were provided. So we can't log the user in.
                 print "Informacoes invalidas de Login: {0}, {1}".format(username, password)
@@ -182,30 +190,56 @@ def users(request):
                 pass
             else:
                 if user in friend_list.friends.all():
-                    users_dict.append({'user':user, 'profile':UserProfile.objects.get(user=user), 'is_friend': True})
+                    users_dict.append({'user':user, 'profile':UserProfile.objects.get(user=user), 'public_profile':PublicProfile.objects.get(user=user), 'is_friend': True})
                 else:
-                     users_dict.append({'user':user, 'profile':UserProfile.objects.get(user=user), 'is_friend': False})
+                     users_dict.append({'user':user, 'profile':UserProfile.objects.get(user=user), 'public_profile':PublicProfile.objects.get(user=user), 'is_friend': False})
 
         context_dict.update({'users': users_dict})
 
     else:
         users_profile = UserProfile.objects.filter(display_name__contains=request.POST['search'])
+        public_profiles = PublicProfile.objects.filter(tags__contains=request.POST['search'])
 
-        for user_profile in users_profile:
-            user = User.objects.get(id=user_profile.user.id)
-            friend_list = Friendlist.objects.get_or_create(main_user=user)[0]
+        if len(users_profile) == 0 and len(public_profiles) == 0:
+            context_dict.update({'empty':True, 'search':request.POST['search']})
+        else:
+            for user_profile in users_profile:
+                user = User.objects.get(id=user_profile.user.id)
+                friend_list = Friendlist.objects.get_or_create(main_user=user)[0]
 
-            if user.username == 'moderador':
-                pass
-            elif user.username == 'admin':
-                pass
-            else:
-                if user in friend_list.friends.all():
-                    users_dict.append({'user':user, 'profile':user_profile, 'is_friend': True})
+                if user.username == 'moderador':
+                    pass
+                elif user.username == 'admin':
+                    pass
+                elif user == request.user:
+                    pass
                 else:
-                     users_dict.append({'user':user, 'profile':user_profile, 'is_friend': False})
+                    if user in friend_list.friends.all():
+                        users_dict.append({'user':user, 'profile':user_profile, 'public_profile':PublicProfile.objects.get(user=user), 'is_friend': True})
+                    else:
+                         users_dict.append({'user':user, 'profile':user_profile, 'public_profile':PublicProfile.objects.get(user=user), 'is_friend': False})
 
-        context_dict.update({'users': users_dict})
+            for public_profile in public_profiles:
+                user = User.objects.get(id=public_profile.user.id)
+                user_profile = UserProfile.objects.filter(user=user)[0]
+                friend_list = Friendlist.objects.get_or_create(main_user=user)[0]
+
+                if user.username == 'moderador':
+                    pass
+                elif user.username == 'admin':
+                    pass
+                elif user == request.user:
+                    pass
+                else:
+                    if user in friend_list.friends.all():
+                        users_dict.append({'user':user, 'profile':user_profile, 'public_profile':public_profile, 'is_friend': True})
+                    else:
+                         users_dict.append({'user':user, 'profile':user_profile, 'public_profile':public_profile, 'is_friend': False})
+
+            if len(users_dict) == 0:
+                context_dict.update({'empty':True, 'search':request.POST['search']})
+            else:
+                context_dict.update({'users': users_dict})
 
     return render(request, 'netdev/users.html', context_dict)
 
@@ -296,6 +330,10 @@ def new_message(request):
             else:
                 context_dict.update({'erro':'Por favor, preencha o corpo da mensagem'})
                 return render(request, 'netdev/messages/new_message.html', context_dict)
+    else:
+        friend_list = Friendlist.objects.get_or_create(main_user=request.user)[0]
+        print friend_list.friends.all()
+        context_dict.update({'friend_list':friend_list.friends.all()})
 
     return render(request, 'netdev/messages/new_message.html', context_dict)
 
@@ -440,9 +478,9 @@ def profile_friends(request, username):
 
     for friend in friend_list.friends.all():
         if friend in main_friend_list.friends.all():
-            users_dict.append({'user':friend, 'profile':UserProfile.objects.get(user=friend), 'is_friend': True})
+            users_dict.append({'user':friend, 'profile':UserProfile.objects.get(user=friend), 'public_profile':PublicProfile.objects.get(user=friend), 'is_friend': True})
         else:
-            users_dict.append({'user':friend, 'profile':UserProfile.objects.get(user=friend), 'is_friend': False})
+            users_dict.append({'user':friend, 'profile':UserProfile.objects.get(user=friend), 'public_profile':PublicProfile.objects.get(user=friend), 'is_friend': False})
 
     context_dict.update({'users': users_dict})
 
@@ -510,6 +548,86 @@ def edit_status(request, update_id):
     return render(request, 'netdev/profile/edit_status.html', context_dict )
 
 @login_required
+def check_account(request):
+    context_dict = user_info(request)
+    return render(request, 'netdev/profile/check_account.html', context_dict)
+
+@login_required
+def deactivate_account(request):
+    context_dict = user_info(request)
+    user = request.user
+
+    if request.POST:
+        if 'password' in request.POST:
+            username = user
+            user_auth = authenticate(username=username, password=request.POST['password'])
+            if user_auth:
+                user.is_active = False
+                user.save()
+                logout(request)
+                return render(request, 'netdev/profile/confirm_deactivate.html', context_dict)
+            else:
+                context_dict.update({'erro':'erro'})
+                return render(request, 'netdev/profile/deactivate_account.html', context_dict)
+
+    return render(request, 'netdev/profile/deactivate_account.html', context_dict)
+
+@login_required
+def change_password(request):
+    context_dict = user_info(request)
+    user = request.user
+
+    if request.POST:
+        print request.POST
+        user_auth = authenticate(username=user, password=request.POST['current_password'])
+        pass1 = request.POST['new_password']
+        pass2 = request.POST['new_password2']
+        if user_auth:
+            if pass1 == pass2:
+                user.set_password(pass1)
+                user.save()
+                update_session_auth_hash(request, user)
+
+                return render(request, 'netdev/profile/confirm_password.html', context_dict)
+            else:
+                context_dict.update({'error2':True, 'pass':request.POST['current_password']})
+        else:
+            if pass1 == pass2:
+                context_dict.update({'error1':True, 'pass2':pass2})
+            else:
+                context_dict.update({'error1':True, 'error2':True})
+
+    return render(request, 'netdev/profile/change_password.html', context_dict)
+
+@login_required
+def view_account(request):
+    context_dict = user_info(request)
+    user = request.user
+    context_dict.update({'public_user': user,
+                    'public_user_general':UserProfile.objects.get(user=user),
+                    'public_user_profile':PublicProfile.objects.get(user=user)})
+
+    return render(request, 'netdev/profile/view_account.html', context_dict)
+
+@login_required
+def edit_account(request):
+    context_dict = user_info(request)
+    user = request.user
+    cur_user = UserProfile.objects.filter(user=user)[0]
+
+    profile_form = UserProfileForm(request.POST or None, request.FILES or None, instance=cur_user)
+    context_dict.update({'profile_form':profile_form})
+
+    if request.method == "POST":
+        if profile_form.is_valid():
+            profile_form_uncommited = profile_form.save(commit=False)
+            profile_form_uncommited.save()
+
+            return redirect('/netdev/minha_conta/')
+
+    return render(request, 'netdev/profile/edit_account.html', context_dict)
+
+@login_required
 def change_profile(request):
     context_dict = user_info(request)
     if request.POST:
@@ -524,7 +642,7 @@ def change_profile(request):
 
             return HttpResponseRedirect('/netdev/perfil/' + str(request.user))
 
-    return render(request, 'netdev/profile/edit_profile.html', context_dict)
+    return render(request, 'netdev/profile/change_profile.html', context_dict)
 
 @login_required
 def confirm_friendship(request, username):
@@ -736,13 +854,14 @@ def topic(request, forum_name_url, subforum_name_url, category_name_url, topic_i
         post_objects = []
         for post in posts:
             user_profile = UserProfile.objects.get(user=post.user)
-            post_objects.append({'user': user_profile, 'post': post})
+            post_objects.append({'user': user_profile, 'post': post, 'public_profile':PublicProfile.objects.get(user=post.user)})
 
         context_dict['forum'] = forum
         context_dict['subforum'] = subforum
         context_dict['category'] = category
         context_dict['topic'] = topic
         context_dict['topic_user'] = topic_user
+        context_dict['topic_user_public'] = PublicProfile.objects.filter(user=topic.user)[0]
         context_dict['posts'] = post_objects
 
     except Topic.DoesNotExist:
@@ -802,6 +921,7 @@ def add_topic(request, forum_name_url, subforum_name_url, category_name_url):
 
 @login_required
 def add_post(request, forum_name_url, subforum_name_url, category_name_url, topic_id):
+    print request.POST
     context = RequestContext(request)
 
     forum_name = forum_name_url.replace('_', ' ')
@@ -811,7 +931,7 @@ def add_post(request, forum_name_url, subforum_name_url, category_name_url, topi
     context_dict = user_info(request)
 
     if request.method == 'POST':
-        form = PostForm(request.POST)
+        form = PostForm(request.POST or None)
 
         if form.is_valid():
             # This time we cannot commit straight away.
@@ -1022,7 +1142,7 @@ def repository_index(request):
 def add_file(request):
 
     context_dict = user_info(request)
-    file_form = RepoFileForm(request.POST)
+    file_form = RepoFileForm(request.POST or None, request.FILES or None)
 
     file_form.fields['category'].queryset = FileCategory.objects.filter(owner=request.user)
 
@@ -1099,6 +1219,8 @@ def edit_file(request, file_id):
 
     editfile_form = RepoFileForm(request.POST or None, request.FILES or None, instance=cur_file)
     editfile_form.fields['category'].queryset = FileCategory.objects.filter(owner=request.user)
+    print editfile_form.fields['front']
+    #print editfile_form
 
     if request.method == "POST":
         if editfile_form.is_valid():

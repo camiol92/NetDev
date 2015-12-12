@@ -1,0 +1,33 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Desativar Conta{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>Confirmação</h1>
+    </div>
+    <div>
+     <form id="login_form" method="post" action="">
+     {% csrf_token %}
+     <div class="row">
+        <div class="col-md-8">
+            <label for="inputPassword">Senha</label>
+            <input type="password" class="form-control" id="inputPassword" name="password" required/>
+            {% if erro %}
+                <p class="help-block">Senha incorreta!</p>
+                {% else %}
+                <p class="help-block"></p>
+            {% endif %}
+        </div>
+     </div>
+     <div class="row">
+         <div class="col-md-8">
+        <button class="btn btn-primary" type="submit">Confirmar</button>
+</div></div>
+    </form>
+    </div>
+
+{% endblock %}
+

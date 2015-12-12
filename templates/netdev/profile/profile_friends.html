@@ -2,11 +2,11 @@
 
 {% load staticfiles %} <!-- New line -->
 
-{% block title %}Index{% endblock %}
+{% block title %}Lista de Amigos{% endblock %}
 
 {% block body_block %}
     <div class="page-header">
-        <h1>{{ public_user.username }}</h1>
+        <h1>Amigos de {{ public_user.username }}</h1>
     </div>
 
     <ul class="nav nav-tabs">
@@ -47,9 +47,15 @@
                     </a>
                     </div>
                 <div class="col-md-6">
-                    <h3>{{ user.profile.display_name }}</h3>
+                <h4>{{ user.profile.display_name }}<br>
+                    {% if user.public_profile.job %}
+                        <small>Ocupação:
+                    <br>{{ user.public_profile.job }}</small>
+                    {% else %}
                     <small>Membro desde:
                     <br>{{ user.user.date_joined.day }}-{{ user.user.date_joined.month }}-{{ user.user.date_joined.year }}</small>
+                    {% endif %}
+                </h4>
                 </div>
             </div>
         </div>

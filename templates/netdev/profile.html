@@ -1,0 +1,54 @@
+{% extends 'netdev/base.html' %}
+
+{% load staticfiles %} <!-- New line -->
+
+{% block title %}Perfil{% endblock %}
+
+{% block body_block %}
+    <div class="page-header">
+        <h1>{{ user.username }}</h1>
+    </div>
+    <div class="row">
+        <div class="media col-md-3">
+            <div class="media-left">
+                {% if user_profile.picture == None %}
+                    <a href="#">
+                        <img class="media-object" src="..." alt="...">
+                    </a>
+                {% else %}
+                    <a href="/netdev/{{ MEDIA_URL }}{{ user_profile.picture }}">
+                        <img class="img-responsive" src="/netdev/{{ MEDIA_URL }}{{ user_profile.picture }}"
+                             alt="profile_image">
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <h2>{{ user_profile.display_name }} | {{ user_profile.gender }}</h2>
+
+        <h2>
+            <small>Membro desde: {{ user_profile.creation_date }}</small>
+        </h2>
+        <a class="btn btn-primary" href="{% url 'change_profile' %}"> Editar Perfil</a>
+    </div>
+    <br>
+
+    <div class="col-md-8">
+        <h3>Localização<br>
+            <small>{{ public_profile.location }}</small>
+        </h3>
+        <h3>Ocupação/Profissão<br>
+            <small>{{ public_profile.job }}</small>
+        </h3>
+        <h3>Formação Acadêmica<br>
+            <small>{{ public_profile.academics }}</small>
+        </h3>
+        <h3>Experiência<br>
+            <small>{{ public_profile.experience }}</small>
+        </h3>
+        <h3>Tags<br>
+            <small>{{ public_profile.tags }}</small>
+        </h3>
+        </div>
+
+{% endblock %}
+

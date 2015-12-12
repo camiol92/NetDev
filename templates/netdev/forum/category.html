@@ -1,6 +1,6 @@
 {% extends 'netdev/base.html' %}
 
-{% block title %}Forum{% endblock %}
+{% block title %}Categoria{% endblock %}
 
 {% block body_block %}
     <div class="page-header">
@@ -51,7 +51,7 @@
                 </div>
             {% endif %}
 
-            <form class="new-topic" method="post" action="novo_topico/">
+            <form class="new-topic" method="get" action="novo_topico/">
                 {% csrf_token %}
                 <button class="btn btn-primary" type="submit" value="Submit">Novo Tópico</button>
             </form>

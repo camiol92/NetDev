@@ -22,10 +22,10 @@ from datetime import datetime
 #     def __unicode__(self):
 #         return self.name
 
-INF_TIME = datetime.max.replace(tzinfo=timezone.utc)
+#INF_TIME = datetime.max.replace(tzinfo=timezone.utc)
 
 def get_inf_time():
-    return INF_TIME
+    return timezone.get_current_timezone().normalize(timezone.now().astimezone(timezone.get_current_timezone()))
 
 class UserProfile(models.Model):
     # This line is required. Links UserProfile to a User model instance.
@@ -37,9 +37,9 @@ class UserProfile(models.Model):
     )
 
     # The additional attributes we wish to include.
-    display_name = models.CharField(max_length=100)
-    picture = models.ImageField(upload_to='profile_images', default='profile_images/default_avatar.png')
-    gender = models.CharField('gender', max_length=1, choices=GENDER_CHOICES)
+    display_name = models.CharField(_('Nome do Exibicao'), max_length=100)
+    picture = models.ImageField(_('Foto de Perfil'), upload_to='profile_images', default='profile_images/default_avatar.png', help_text='Opcional, pode ser adicionada posteriormente')
+    gender = models.CharField(_('Genero'), max_length=1, choices=GENDER_CHOICES)
     creation_date = models.DateTimeField(default=get_inf_time)
 
     # Override the __unicode__() method to return out something meaningful!
@@ -56,8 +56,6 @@ class PublicProfile(models.Model):
     experience = models.TextField(blank=True)
     academics = models.TextField(blank=True)
     tags = models.TextField(blank=True)
-    #repositorio
-
 
     # Override the __unicode__() method to return out something meaningful!
     def __unicode__(self):
@@ -193,10 +191,10 @@ class Post(models.Model):
 class FileCategory(models.Model):
     name = models.CharField(_('Nome do Diretorio'), max_length=100,
         help_text=_('Name of the category. 100 chars maximum.'))
-    description = models.TextField(_('Descricao do arquivo'))
+    description = models.TextField(_('Descricao do diretorio'))
     pub_date = models.DateTimeField(auto_now_add=True)
     last_mod = models.DateTimeField(auto_now_add=True)
-    owner = models.ForeignKey(User, blank=True, null=True, related_name="owner")
+    owner = models.ForeignKey(User, related_name="owner")
 
     class Meta:
         ordering = ['name']
@@ -215,9 +213,9 @@ class RepoFile(models.Model):
     name = models.CharField(_('Nome'), max_length=250,
         help_text=_('Esse vai ser o nome visivel do arquivo.'))
     description = models.TextField(_('Descricao do arquivo'))
-    front = models.ImageField(_('Imagem para o arquivo'),upload_to='images/', blank=True, null=True, default='images/file_icon.png') #size=(150, 200, True)
+    front = models.ImageField(_('Imagem para o arquivo'), help_text='Campo Opcional', upload_to='images/', blank=True, null=True, default='images/file_icon.png') #size=(150, 200, True)
     stored_file = models.FileField(upload_to='files/', verbose_name=_('Arquivo'),
-        help_text=_('Tamanho maximo 104Mb'), blank=True, null=True)
+        help_text=_('Tamanho maximo 104Mb'), error_messages={'erro':'Adicione um Arquivo'})
     category = models.ForeignKey(FileCategory, verbose_name=_('Selecione o Diretorio'), related_name='files')
     public = models.BooleanField(_('Tornar Publico'), default=False,
         help_text=_('Selecione para tornar o arquivo publico.'))

@@ -25,6 +25,11 @@
            {% bootstrap_form user_form %}
            {% bootstrap_form profile_form %}
 
+<div class="checkbox">
+    <label>
+      <input type="checkbox"> Eu concordo com as <a href="{% url 'data' %}">Política de Dados</a> e os <a href="{% url 'acceptance' %}">Termos de Aceitação</a>.
+    </label>
+    </div>
             <!-- Provide a button to click to submit the form. -->
         <button class="btn btn-lg btn-primary btn-block" type="submit">Registrar</button>
         </form>
