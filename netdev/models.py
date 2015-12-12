@@ -22,10 +22,10 @@ from datetime import datetime
 #     def __unicode__(self):
 #         return self.name
 
-#INF_TIME = datetime.max.replace(tzinfo=timezone.utc)
+INF_TIME = datetime.max.replace(tzinfo=timezone.utc)
 
 def get_inf_time():
-    return timezone.get_current_timezone().normalize(timezone.now().astimezone(timezone.get_current_timezone()))
+    return INF_TIME
 
 class UserProfile(models.Model):
     # This line is required. Links UserProfile to a User model instance.
@@ -37,9 +37,9 @@ class UserProfile(models.Model):
     )
 
     # The additional attributes we wish to include.
-    display_name = models.CharField(_('Nome do Exibicao'), max_length=100)
-    picture = models.ImageField(_('Foto de Perfil'), upload_to='profile_images', default='profile_images/default_avatar.png')
-    gender = models.CharField(_('Genero'), max_length=1, choices=GENDER_CHOICES)
+    display_name = models.CharField(max_length=100)
+    picture = models.ImageField(upload_to='profile_images', default='profile_images/default_avatar.png')
+    gender = models.CharField('gender', max_length=1, choices=GENDER_CHOICES)
     creation_date = models.DateTimeField(default=get_inf_time)
 
     # Override the __unicode__() method to return out something meaningful!

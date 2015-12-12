@@ -56,7 +56,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = ['netdev.pythonanywhere.com']
+ALLOWED_HOSTS = []
 
 
 # Application definition
