@@ -31,6 +31,8 @@ class RepoFileAdmin(admin.ModelAdmin):
 admin.site.register(FileCategory, FileCategoryAdmin)
 admin.site.register(RepoFile, RepoFileAdmin)
 admin.site.register(Forum)
+admin.site.register(SubForum)
+admin.site.register(Category)
 admin.site.register(Topic)
 admin.site.register(Post)
 admin.site.register(UserProfile)
