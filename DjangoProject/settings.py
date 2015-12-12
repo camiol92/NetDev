@@ -7,7 +7,6 @@ https://docs.djangoproject.com/en/1.7/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
@@ -52,7 +51,7 @@ DATABASE_PATH = os.path.join(PROJECT_PATH, 'netdev.db')
 SECRET_KEY = '&u#=aek)j+$_-nbj91m+ipr5)so)e)2r+56dl*ix@idy8h5gw3'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = True
 
