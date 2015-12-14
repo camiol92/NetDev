@@ -10,14 +10,14 @@
             </div>
             <div>
                 {% if user.is_authenticated %}
-            <p></strong>  Voce ja visitou esse site {{ visits }} vezes! <br>
-         Seu ultimo acesso foi em {{ last_visit }} </p>
+            <h3>Bem-vindo de volta!</h3>
+                    <p>Seu ultimo acesso foi em {{ last_visit }} </p>
 
             {% else %}
-                    <h3>Bem vindo ao NetDev!</h3>
+                    <h3>Bem-vindo ao NetDev!</h3>
                 {% endif %}
                     <hr>
-                <h4>Tendo problemas? Fale com nossos administradores!</h4>
+                <h4>Tendo dúvidas? Fale com nossos administradores!</h4>
                     <h4><small>Camila Lopes: camiol92@gmail.com</small></h4>
                     <h4><small>Fabio Rachid: fabiorbap@gmail.com</small></h4>
             <hr>
