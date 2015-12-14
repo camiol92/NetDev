@@ -222,11 +222,14 @@ def users(request):
                         if user in friend_list.friends.all():
                             users_dict.append({'user':user, 'profile':user_profile, 'public_profile':PublicProfile.objects.get(user=user), 'is_friend': True})
                         else:
-                             users_dict.append({'user':user, 'profile':user_profile, 'public_profile':PublicProfile.objects.get(user=user), 'is_friend': False})
+                            users_dict.append({'user':user, 'profile':user_profile, 'public_profile':PublicProfile.objects.get(user=user), 'is_friend': False})
+
+                    control.add(user)
 
             for public_profile in public_profiles:
                 user = User.objects.get(id=public_profile.user.id)
                 if user in control:
+                    print 'achei' + user.username
                     pass
                 else:
                     user_profile = UserProfile.objects.filter(user=user)[0]
@@ -242,7 +245,9 @@ def users(request):
                         if user in friend_list.friends.all():
                             users_dict.append({'user':user, 'profile':user_profile, 'public_profile':public_profile, 'is_friend': True})
                         else:
-                             users_dict.append({'user':user, 'profile':user_profile, 'public_profile':public_profile, 'is_friend': False})
+                            users_dict.append({'user':user, 'profile':user_profile, 'public_profile':public_profile, 'is_friend': False})
+
+                    control.add(user)
 
             if len(users_dict) == 0:
                 context_dict.update({'empty':True, 'search':request.POST['search']})
