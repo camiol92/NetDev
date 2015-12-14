@@ -177,6 +177,7 @@ def user_login(request):
 def users(request):
     context_dict = user_info(request)
     users_dict = []
+    control = set()
 
     print request.POST
     if request.POST['search'] == '':
@@ -193,6 +194,7 @@ def users(request):
                     users_dict.append({'user':user, 'profile':UserProfile.objects.get(user=user), 'public_profile':PublicProfile.objects.get(user=user), 'is_friend': True})
                 else:
                      users_dict.append({'user':user, 'profile':UserProfile.objects.get(user=user), 'public_profile':PublicProfile.objects.get(user=user), 'is_friend': False})
+            control.add(user)
 
         context_dict.update({'users': users_dict})
 
@@ -205,36 +207,42 @@ def users(request):
         else:
             for user_profile in users_profile:
                 user = User.objects.get(id=user_profile.user.id)
-                friend_list = Friendlist.objects.get_or_create(main_user=user)[0]
-
-                if user.username == 'moderador':
-                    pass
-                elif user.username == 'admin':
-                    pass
-                elif user == request.user:
+                if user in control:
                     pass
                 else:
-                    if user in friend_list.friends.all():
-                        users_dict.append({'user':user, 'profile':user_profile, 'public_profile':PublicProfile.objects.get(user=user), 'is_friend': True})
+                    friend_list = Friendlist.objects.get_or_create(main_user=user)[0]
+
+                    if user.username == 'moderador':
+                        pass
+                    elif user.username == 'admin':
+                        pass
+                    elif user == request.user:
+                        pass
                     else:
-                         users_dict.append({'user':user, 'profile':user_profile, 'public_profile':PublicProfile.objects.get(user=user), 'is_friend': False})
+                        if user in friend_list.friends.all():
+                            users_dict.append({'user':user, 'profile':user_profile, 'public_profile':PublicProfile.objects.get(user=user), 'is_friend': True})
+                        else:
+                             users_dict.append({'user':user, 'profile':user_profile, 'public_profile':PublicProfile.objects.get(user=user), 'is_friend': False})
 
             for public_profile in public_profiles:
                 user = User.objects.get(id=public_profile.user.id)
-                user_profile = UserProfile.objects.filter(user=user)[0]
-                friend_list = Friendlist.objects.get_or_create(main_user=user)[0]
-
-                if user.username == 'moderador':
-                    pass
-                elif user.username == 'admin':
-                    pass
-                elif user == request.user:
+                if user in control:
                     pass
                 else:
-                    if user in friend_list.friends.all():
-                        users_dict.append({'user':user, 'profile':user_profile, 'public_profile':public_profile, 'is_friend': True})
+                    user_profile = UserProfile.objects.filter(user=user)[0]
+                    friend_list = Friendlist.objects.get_or_create(main_user=user)[0]
+
+                    if user.username == 'moderador':
+                        pass
+                    elif user.username == 'admin':
+                        pass
+                    elif user == request.user:
+                        pass
                     else:
-                         users_dict.append({'user':user, 'profile':user_profile, 'public_profile':public_profile, 'is_friend': False})
+                        if user in friend_list.friends.all():
+                            users_dict.append({'user':user, 'profile':user_profile, 'public_profile':public_profile, 'is_friend': True})
+                        else:
+                             users_dict.append({'user':user, 'profile':user_profile, 'public_profile':public_profile, 'is_friend': False})
 
             if len(users_dict) == 0:
                 context_dict.update({'empty':True, 'search':request.POST['search']})

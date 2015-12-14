@@ -190,7 +190,7 @@ class Post(models.Model):
 #Repository Models
 class FileCategory(models.Model):
     name = models.CharField(_('Nome do Diretorio'), max_length=100,
-        help_text=_('Name of the category. 100 chars maximum.'))
+        help_text=_('Nome do Diretorio. Maximo de 100 caracteres.'))
     description = models.TextField(_('Descricao do diretorio'))
     pub_date = models.DateTimeField(auto_now_add=True)
     last_mod = models.DateTimeField(auto_now_add=True)

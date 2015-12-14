@@ -104,7 +104,7 @@ DATABASE_PATH = os.path.join(PROJECT_PATH, 'netdev.db')
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
 TIME_ZONE = 'America/Sao_Paulo'
 
