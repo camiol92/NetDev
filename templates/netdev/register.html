@@ -2,7 +2,7 @@
 
 {% load bootstrap3 %}
 
-{% block title %}Registre-se{% endblock %}
+{% block title %}Registrar{% endblock %}
 
 {% block body %}
 
@@ -10,10 +10,11 @@
             <div class="page-header">
         <h1>Obrigado por se Registrar!</h1>
     </div>
+            <div class="col-md-8">
             <div class="alert alert-success" role="alert">
             Usuário Registrado com sucesso!
                 <a href="{% url 'login' %}" class="alert-link">Clique aqui para entrar!</a>
-            </div>
+            </div></div>
 
         {% else %}
             <div class="col-md-4"></div>
@@ -25,7 +26,7 @@
            {% bootstrap_form user_form %}
            {% bootstrap_form profile_form %}
 
-            <b>Ao se cadastrar, você está concordando com as <a href="{% url 'data' %}">Política de Dados</a> e os <a href="{% url 'acceptance' %}">Termos de Aceitação</a>.</b>
+            <b>Ao se cadastrar, você está concordando com a <a href="{% url 'data' %}">Política de Dados</a> e os <a href="{% url 'acceptance' %}">Termos de Aceitação</a>.</b>
 <br><br>
             <!-- Provide a button to click to submit the form. -->
         <button class="btn btn-lg btn-primary btn-block" type="submit">Registrar</button>
